@@ -1,0 +1,72 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1.5rem;
+  gap: 2.5rem;
+}
+.topBar { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 700px; }
+.backBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+}
+.backBtn:hover { color: var(--text); border-color: var(--text-muted); }
+.logo {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  color: var(--accent2);
+  background: rgba(255,209,102,0.08);
+  border: 1px solid rgba(255,209,102,0.25);
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+}
+.gameTitle { font-family: var(--font-display); font-size: 2rem; font-weight: 400; letter-spacing: 0.05em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; width: 100%; max-width: 700px; }
+.playerDie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.2rem 1rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.playerDie.winner { border-color: var(--accent2); transform: scale(1.05); box-shadow: 0 4px 24px rgba(255,209,102,0.35); }
+.face { font-size: 3rem; line-height: 1; }
+.playerName { font-size: 0.9rem; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
+.winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
+.winnerName {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #f0eeff, #ffd166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  max-width: min(90vw, 700px);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.errorNote { color: var(--danger); font-size: 0.85rem; }
+.rollBtn {
+  background: linear-gradient(135deg, var(--accent2), #ffb347);
+  border: none;
+  border-radius: 12px;
+  color: #1a1400;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  padding: 1rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(255,209,102,0.3);
+}
+.rollBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,209,102,0.45); }
+.rollBtn:disabled { opacity: 0.6; cursor: not-allowed; }

@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dilemma_killer_ts
+      POSTGRES_USER: dilemma
+      POSTGRES_PASSWORD: dilemma
+    ports:
+      - "5433:5432"
+    volumes:
+      - dilemma_killer_ts_pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/10-create-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dilemma -d dilemma_killer_ts"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  dilemma_killer_ts_pgdata:

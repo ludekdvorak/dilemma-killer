@@ -1,0 +1,81 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1.5rem;
+  gap: 2.5rem;
+}
+.topBar { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 700px; }
+.backBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+}
+.backBtn:hover { color: var(--text); border-color: var(--text-muted); }
+.logo {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  color: var(--accent3);
+  background: rgba(6,214,160,0.08);
+  border: 1px solid rgba(6,214,160,0.25);
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+}
+.gameTitle { font-family: var(--font-display); font-size: 2rem; font-weight: 400; letter-spacing: 0.05em; }
+.cardWrap { perspective: 1000px; }
+.card {
+  width: 160px;
+  height: 224px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+.card.flipped { transform: rotateY(180deg); }
+.cardFace {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  border: 1.5px solid var(--border);
+}
+.cardBack { background: linear-gradient(135deg, var(--surface2), var(--surface)); font-size: 3rem; }
+.cardFront { background: var(--surface2); transform: rotateY(180deg); flex-direction: column; gap: 0.5rem; }
+.cardRank { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; }
+.cardRed { color: var(--danger); }
+.cardBlack { color: var(--text); }
+.winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
+.winnerName {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #f0eeff, #06d6a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  max-width: min(90vw, 700px);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.errorNote { color: var(--danger); font-size: 0.85rem; }
+.drawBtn {
+  background: linear-gradient(135deg, var(--accent3), #00b894);
+  border: none;
+  border-radius: 12px;
+  color: #012a20;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  padding: 1rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(6,214,160,0.3);
+}
+.drawBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(6,214,160,0.45); }
+.drawBtn:disabled { opacity: 0.6; cursor: not-allowed; }
