@@ -16,6 +16,11 @@ const envSchema = z.object({
   ALLOW_MOCK_UPGRADE: z.enum(['true', 'false']).optional(),
   RUN_MIGRATIONS_ON_START: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
+  APP_BASE_URL: z.string().url().optional(),
+  GOPAY_GOID: z.string().min(1).optional(),
+  GOPAY_CLIENT_ID: z.string().min(1).optional(),
+  GOPAY_CLIENT_SECRET: z.string().min(1).optional(),
+  GOPAY_GATEWAY_URL: z.string().url().default('https://gw.sandbox.gopay.com/api'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -30,6 +35,12 @@ const localDatabaseUrl = 'postgresql://dilemma:dilemma@localhost:5433/dilemma_ki
 const developmentSecret = 'development-only-secret-change-before-production-32-bytes';
 const databaseUrl = env.DATABASE_URL ?? (isProduction ? '' : localDatabaseUrl);
 const jwtSecret = env.JWT_SECRET ?? (isProduction ? '' : developmentSecret);
+const goPayConfigured = Boolean(
+  env.APP_BASE_URL
+  && env.GOPAY_GOID
+  && env.GOPAY_CLIENT_ID
+  && env.GOPAY_CLIENT_SECRET,
+);
 
 if (!databaseUrl || (isProduction && databaseUrl === localDatabaseUrl)) {
   throw new Error('A non-development DATABASE_URL is required in production.');
@@ -66,4 +77,14 @@ export const config = {
   runMigrationsOnStart: env.RUN_MIGRATIONS_ON_START,
   trustProxyHops: env.TRUST_PROXY_HOPS,
   authCookieName: 'dilemma_killer_session',
+  appBaseUrl: env.APP_BASE_URL,
+  goPay: {
+    configured: goPayConfigured,
+    goId: env.GOPAY_GOID,
+    clientId: env.GOPAY_CLIENT_ID,
+    clientSecret: env.GOPAY_CLIENT_SECRET,
+    gatewayUrl: env.GOPAY_GATEWAY_URL.replace(/\/$/, ''),
+    premiumAmountMinor: 200,
+    premiumCurrency: 'EUR',
+  },
 } as const;

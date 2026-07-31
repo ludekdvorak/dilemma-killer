@@ -5,9 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import styles from './GameSelect.module.css';
 
 const COMING_SOON = [
-  { id: 'roulette', icon: '🔴', name: 'Roulette', description: 'Spin your fate', color: '#ef4444' },
-  { id: 'horserace', icon: '🏇', name: 'Horse Racing', description: 'Bet on the right horse', color: '#ef4444' },
-  { id: 'bomb', icon: '💣', name: 'Ticking Bomb', description: 'Pass it around until it explodes', color: '#e040fb' },
+  { id: 'roulette', icon: '🔴', name: 'Roulette', description: 'Spin your fate', color: '#ff3d81' },
+  { id: 'horserace', icon: '🏇', name: 'Horse Racing', description: 'Bet on the right horse', color: '#ffb800' },
+  { id: 'bomb', icon: '💣', name: 'Ticking Bomb', description: 'Pass it before it blows', color: '#a855f7' },
 ] as const;
 
 interface GameSelectProps {
@@ -19,6 +19,12 @@ interface GameSelectProps {
 }
 
 type GameCardStyle = CSSProperties & { '--game-color': string };
+const GAME_COLORS: Record<GameId, string> = {
+  wheel: '#8b5cf6',
+  dice: '#22d3ee',
+  slots: '#f6c453',
+  cards: '#ff3d81',
+};
 
 export default function GameSelect({
   players,
@@ -61,10 +67,11 @@ export default function GameSelect({
           <button className={styles.backBtn} onClick={onBack}>← Back</button>
           {user && <button className={styles.statsBtn} onClick={onViewStatistics}>Your statistics</button>}
         </div>
-        <div className={styles.logo}>⚔️ DILEMMA KILLER</div>
-        <h1 className={styles.title}>WHAT ARE WE PLAYING?</h1>
+        <div className={styles.logo}>🎮 DILEMMA KILLER</div>
+        <div className={styles.eyebrow}>PICK YOUR POISON</div>
+        <h1 className={styles.title}>CHOOSE YOUR <span>CHAOS</span></h1>
         <p className={styles.subtitle}>
-          <span className={styles.playerCount}>{players.length} players</span> ready for battle
+          <span className={styles.playerCount}>● {players.length} PLAYERS READY</span> Tap a game to start instantly.
         </p>
       </header>
 
@@ -75,7 +82,7 @@ export default function GameSelect({
           <button
             key={game.id}
             className={`${styles.gameCard} ${game.locked ? styles.locked : ''}`}
-            style={{ '--game-color': game.locked ? '#7c7c9e' : '#ff6b35' } as GameCardStyle}
+            style={{ '--game-color': GAME_COLORS[game.id] } as GameCardStyle}
             onClick={() => handleClick(game)}
           >
             <div className={styles.gameIcon}>{game.icon}</div>

@@ -52,7 +52,9 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, _ne
   if (isPostgresError(error) && error.code === '23505') {
     const message = error.constraint?.includes('users_email')
       ? 'Email already registered'
-      : 'That saved player already exists';
+      : error.constraint?.includes('saved_groups')
+        ? 'A group with that name already exists'
+        : 'That saved player already exists';
     response.status(409).json({ message });
     return;
   }

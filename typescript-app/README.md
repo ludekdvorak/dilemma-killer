@@ -14,12 +14,16 @@ Express serves both the API and the compiled React application in production. Th
 
 ## Features
 
-- Lucky Wheel and Dice Roll are free
+- Lucky Wheel, 3D Dice Roll, and Winner Slots are free
 - Card Draw is Premium
 - Optional email/password accounts
 - Saved player roster for signed-in users
+- Reusable saved player groups
+- Editable display name, email, and password
+- Main-menu and detailed per-user play statistics
+- GoPay Sandbox integration for a recurring €2/month Premium subscription
 - Demo Premium upgrade, always disabled in production
-- Per-user play statistics
+- Animated star-flight background and floating 3D dice
 - Roulette, Horse Racing, and Ticking Bomb placeholders
 
 Statistics are recorded only for successful games played while signed in. PostgreSQL stores the game type, player count, and timestamp; it does not store party-player names or game results.
@@ -76,6 +80,11 @@ DATABASE_URL=postgresql://...
 JWT_SECRET=<output-of-openssl-rand-base64-48>
 ALLOW_MOCK_UPGRADE=false
 RUN_MIGRATIONS_ON_START=true
+APP_BASE_URL=https://your-public-app.example
+GOPAY_GOID=<your-gopay-goid>
+GOPAY_CLIENT_ID=<your-gopay-client-id>
+GOPAY_CLIENT_SECRET=<your-gopay-client-secret>
+GOPAY_GATEWAY_URL=https://gate.gopay.cz/api
 ```
 
 Set `DATABASE_SSL=true` if required by the database provider. Keep `DATABASE_SSL_REJECT_UNAUTHORIZED=true` when the provider supplies a trusted certificate. The server binds to `0.0.0.0` and reads the platform's `PORT` automatically.
@@ -102,10 +111,27 @@ The included `Dockerfile` packages the same one-service production build if the 
 | `ALLOW_MOCK_UPGRADE` | Enable the payment-free Premium demo outside production | Always disabled in production |
 | `RUN_MIGRATIONS_ON_START` | Apply committed migrations before listening | `true` |
 | `VITE_BACKEND_URL` | Development proxy destination | `http://localhost:8080` |
+| `APP_BASE_URL` | Public HTTPS origin used for GoPay returns and notifications | Not set |
+| `GOPAY_GOID` | GoPay merchant account identifier | Not set |
+| `GOPAY_CLIENT_ID` | GoPay OAuth client identifier | Not set |
+| `GOPAY_CLIENT_SECRET` | GoPay OAuth client secret | Not set |
+| `GOPAY_GATEWAY_URL` | GoPay REST API origin | Sandbox API |
 
 The frontend and API intentionally use the same origin. Authentication uses an `HttpOnly`, `SameSite=Lax`, and production-only `Secure` session cookie, so no token is exposed to browser JavaScript. If the hosting provider has a reverse proxy, set `TRUST_PROXY_HOPS` to the provider's documented hop count.
 
 Generate a production secret with `openssl rand -base64 48`. The application rejects the example and development secrets in production.
+
+### GoPay setup
+
+The checkout is intentionally disabled until all GoPay values and `APP_BASE_URL` are configured.
+Register a GoPay business/sandbox account to receive your own GoID, Client ID, and Client Secret;
+GoPay does not provide shared sandbox credentials. Recurring payments are enabled in sandbox, but
+GoPay support must activate recurring payments before production use. Configure your settlement bank
+account in the GoPay business account—the application never stores bank or card details.
+
+Premium checkout creates an automatic monthly recurrence for EUR 2.00. Premium is activated only
+after the backend independently reads a `PAID` status from GoPay. Notification processing is
+idempotent, and each verified monthly charge extends access by one month.
 
 ### PostgreSQL integration tests
 
@@ -124,14 +150,21 @@ docker compose exec postgres createdb -U dilemma dilemma_killer_ts_test
 ## API
 
 - `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`
-- `GET /api/auth/me`, `POST /api/auth/upgrade`
+- `GET /api/auth/me`, `PATCH /api/auth/profile`, `POST /api/auth/password`
+- `POST /api/auth/upgrade` (development demo only)
 - `GET /api/players`, `POST /api/players`, `DELETE /api/players/:id`
+- `GET /api/groups`, `POST /api/groups`, `PUT /api/groups/:id`, `DELETE /api/groups/:id`
 - `GET /api/games`
 - `POST /api/wheel/spin`
 - `GET /api/wheel/health`
 - `POST /api/games/dice/roll`
+- `POST /api/games/slots/spin`
 - `POST /api/games/cards/draw`
 - `GET /api/statistics`
+- `POST /api/payments/gopay`, `GET /api/payments/order/:order/status`
+- `GET /api/payments/subscription/status`, `POST /api/payments/subscription/cancel`
+- `GET|POST /api/payments/gopay/notification`
 - `GET /api/config`, `GET /api/health`, `GET /api/ready`
 
-The upgrade endpoint is deliberately a demo. Do not sell Premium until it has been replaced by a verified payment webhook.
+The mock upgrade remains for local testing only. Production Premium activation uses verified GoPay
+payment status and never trusts a browser redirect by itself.

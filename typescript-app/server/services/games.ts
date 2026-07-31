@@ -4,6 +4,7 @@ import type {
   GameId,
   GameSummary,
   Player,
+  SlotResult,
   SpinResult,
 } from '../../shared/contracts.js';
 
@@ -25,6 +26,13 @@ const GAME_DEFINITIONS: ReadonlyArray<Omit<GameSummary, 'locked'>> = [
     name: 'Dice Roll',
     description: 'Everyone rolls; the highest number wins',
     icon: '🎲',
+    premium: false,
+  },
+  {
+    id: 'slots',
+    name: 'Winner Slots',
+    description: 'Pull the lever and line up a guaranteed winner',
+    icon: '🎰',
     premium: false,
   },
   {
@@ -102,4 +110,10 @@ export function drawCard(players: Player[], random: RandomSource = Math.random):
     winnerIndex,
     card: `${rank}${suit}`,
   };
+}
+
+export function spinSlots(players: Player[], random: RandomSource = Math.random): SlotResult {
+  requirePlayers(players);
+  const winnerIndex = randomIndex(players.length, random);
+  return { winner: players[winnerIndex], winnerIndex };
 }

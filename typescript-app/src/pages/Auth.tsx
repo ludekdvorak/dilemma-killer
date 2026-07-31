@@ -41,7 +41,7 @@ export default function Auth({ onDone, onSkip }: AuthProps) {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <div className={styles.logo}>⚔️ DILEMMA KILLER</div>
+        <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.title}>{mode === 'login' ? 'SIGN IN' : 'REGISTER'}</h1>
       </header>
 

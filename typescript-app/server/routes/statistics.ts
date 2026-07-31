@@ -21,7 +21,7 @@ statisticsRouter.get('/', async (request, response) => {
     [request.user!.id],
   );
 
-  const byGame: Record<GameId, number> = { wheel: 0, dice: 0, cards: 0 };
+  const byGame: Record<GameId, number> = { wheel: 0, dice: 0, slots: 0, cards: 0 };
   let lastPlayedAt: Date | null = null;
 
   for (const row of result.rows) {
