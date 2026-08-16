@@ -16,15 +16,17 @@
 .machineSpinning .reel{box-shadow:inset 0 18px 25px rgba(25,21,48,.22),inset 0 -18px 25px rgba(25,21,48,.22),0 0 22px rgba(255,195,67,.24)}
 .machineFooter{display:flex;justify-content:space-between;align-items:center;padding:.85rem .5rem .1rem;color:#caa95d;font:700 .58rem var(--font-display);letter-spacing:.13em}
 .lights{display:flex;gap:.35rem}.lights i{width:7px;height:7px;border-radius:50%;background:#ffbd36;box-shadow:0 0 8px #ff8a1e;animation:blink .7s alternate infinite}.lights i:nth-child(even){animation-delay:-.35s}
-.lever{position:absolute;right:-42px;top:42%;width:40px;height:130px;background:none;border:0;transform-origin:50% 90%}
-.leverArm{position:absolute;width:10px;height:100px;left:15px;bottom:4px;border-radius:8px;background:linear-gradient(90deg,#4c391d,#e3b65f,#6b4d1d);transform-origin:bottom}
-.leverKnob{position:absolute;top:-7px;left:3px;width:34px;height:34px;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 28%,#ffda77,#e74b36 45%,#7b0e1d);box-shadow:0 5px 15px #000}
-.leverPulled{animation:leverPull .6s ease-in-out}.lever:disabled{cursor:wait}
+.lever{position:absolute;right:-58px;top:28%;width:58px;height:172px;padding:0;background:rgba(8,6,12,.5);border:1px solid rgba(226,182,95,.25);border-radius:28px;touch-action:none;user-select:none;overflow:visible;box-shadow:inset 0 0 18px rgba(0,0,0,.68),0 8px 24px rgba(0,0,0,.42)}
+.leverTrack{position:absolute;top:20px;bottom:28px;left:50%;width:14px;translate:-50% 0;border:2px solid #3d2e18;border-radius:10px;background:linear-gradient(90deg,#4c391d,#e3b65f 42%,#6b4d1d 72%);box-shadow:inset 0 0 4px #271707,0 0 10px rgba(255,190,72,.15)}
+.leverArm{position:absolute;top:27px;left:50%;width:6px;height:108px;translate:-50% 0;border-radius:8px;background:linear-gradient(90deg,#5c431e,#ffe09a,#75531f);pointer-events:none}
+.leverKnob{position:absolute;top:8px;left:50%;width:42px;height:42px;translate:-50% 0;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 28%,#ffe49a,#ef6544 42%,#8d1021 72%);border:2px solid rgba(255,218,119,.7);box-shadow:0 7px 17px #000,0 0 15px rgba(231,75,54,.38);transition:transform .24s cubic-bezier(.2,.85,.3,1.15);pointer-events:none}
+.leverHint{position:absolute;left:0;right:0;bottom:8px;color:#d8ad59;font:800 .48rem var(--font-display);letter-spacing:.12em;pointer-events:none}
+.leverPulled{border-color:rgba(255,207,72,.55);box-shadow:inset 0 0 18px rgba(0,0,0,.68),0 0 22px rgba(255,176,38,.2)}.leverDragging .leverKnob{transition:none}.lever:disabled{cursor:wait;opacity:.78}
 .winner{display:flex;flex-direction:column;align-items:center;gap:.2rem}.winner span{color:#ffcf48;font:800 .68rem var(--font-display);letter-spacing:.18em}.winner strong{font:900 clamp(2rem,7vw,3.8rem) var(--font-display);color:#fff;text-align:center;text-shadow:0 0 24px rgba(255,207,72,.55);overflow-wrap:anywhere}
 .error{color:var(--danger);font-size:.82rem}
 .spinBtn{border:1px solid #ffdd76;border-radius:13px;padding:1rem 2rem;background:linear-gradient(135deg,#ffd866,#d68a18);color:#251300;font:900 .82rem var(--font-display);letter-spacing:.08em;box-shadow:0 8px 30px rgba(255,180,45,.3)}
 .spinBtn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 13px 38px rgba(255,180,45,.46)}.spinBtn:disabled{opacity:.65;cursor:wait}
 @keyframes nameSnap{from{opacity:.2;transform:translateY(-35px) scaleY(.8)}}
 @keyframes blink{to{opacity:.35}}
-@keyframes leverPull{0%,100%{transform:rotate(0)}45%{transform:rotate(42deg)}}
-@media(max-width:560px){.page{padding:1rem;gap:1.25rem}.machine{width:calc(100vw - 4.5rem);padding:.7rem;border-radius:22px}.reelWindow{gap:.3rem;padding:.5rem}.reel{height:115px}.lever{right:-38px}.marquee{letter-spacing:.05em}.reelName{font-size:.72rem}.machineFooter{display:none}}
+@media(max-width:560px){.page{padding:1rem;gap:1.25rem}.machine{width:calc(100vw - 5rem);padding:.7rem;border-radius:22px}.reelWindow{gap:.3rem;padding:.5rem}.reel{height:115px}.lever{right:-52px;height:162px}.leverKnob{width:38px;height:38px}.marquee{letter-spacing:.05em}.reelName{font-size:.72rem}.machineFooter{display:none}}
+@media(prefers-reduced-motion:reduce){.leverKnob{transition-duration:.22s!important}.reelName{animation-duration:.18s!important}.lights i,.marquee span{animation:none!important}}

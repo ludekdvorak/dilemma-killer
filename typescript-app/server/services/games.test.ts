@@ -35,11 +35,11 @@ describe('game results', () => {
     expect((result.rotationDegrees + winnerCenterDegrees) % 360).toBe(0);
   });
 
-  it('rolls for everyone and fairly resolves a top tie', () => {
-    const result = rollDice(players, sequence([0.99, 0.99, 0, 0.75]));
+  it('rolls for everyone and preserves every player in a top tie', () => {
+    const result = rollDice(players, sequence([0.99, 0.99, 0]));
     expect(result.rolls.map(({ roll }) => roll)).toEqual([6, 6, 1]);
-    expect(result.winnerIndex).toBe(1);
-    expect(result.winner).toEqual(players[1]);
+    expect(result.winnerIndexes).toEqual([0, 1]);
+    expect(result.winners).toEqual([players[0], players[1]]);
   });
 
   it('draws a valid card for a selected player', () => {

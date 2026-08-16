@@ -22,22 +22,59 @@
   font-size: .7rem; letter-spacing:.14em; color:#b79cff;
 }
 .gameTitle { font-family:var(--font-display);font-size:2rem;font-weight:800;letter-spacing:.05em;text-shadow:0 0 25px rgba(34,211,238,.32) }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; width: 100%; max-width: 700px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; width: 100%; max-width: 760px; }
 .playerDie {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   background: linear-gradient(145deg,rgba(20,17,39,.9),rgba(8,8,18,.92));
   border: 1.5px solid var(--border);
   border-radius: 16px;
-  padding: 1.2rem 1rem;
+  min-width: 0;
+  padding: 1.25rem 1rem 1rem;
   transition: border-color 0.2s, transform 0.2s;
 }
+.playerDie.rolling { border-color: rgba(34,211,238,.42); }
 .playerDie.winner { border-color: var(--accent2); transform: scale(1.05); box-shadow: 0 4px 30px rgba(34,211,238,.35),inset 0 0 24px rgba(34,211,238,.08); }
+.dieStage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 112px;
+}
+.dieShadow {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 72px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.5);
+  filter: blur(7px);
+  transform: translateX(-50%);
+  transition: width .2s, opacity .2s;
+}
+.rolling .dieShadow { width: 48px; opacity: .55; animation: shadowPulse 2s ease-in-out infinite alternate; }
 .playerName { font-size: 0.9rem; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
+.rollValue {
+  min-height: 1em;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: .66rem;
+  letter-spacing: .12em;
+}
+.winner .rollValue { color: var(--accent2); }
 .winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
 .winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
+.winnerNames {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .35rem .8rem;
+  max-width: min(90vw, 760px);
+}
 .winnerName {
   font-family: var(--font-display);
   font-size: 2.5rem;
@@ -48,6 +85,10 @@
   max-width: min(90vw, 700px);
   overflow-wrap: anywhere;
   text-align: center;
+}
+.winnerName:not(:last-child)::after {
+  content: ' +';
+  -webkit-text-fill-color: var(--text-muted);
 }
 .errorNote { color: var(--danger); font-size: 0.85rem; }
 .rollBtn {
@@ -63,3 +104,10 @@
 }
 .rollBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,209,102,0.45); }
 .rollBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+@keyframes shadowPulse {
+  from { transform:translateX(-50%) scale(.72); opacity:.35; }
+  to { transform:translateX(-50%) scale(1.12); opacity:.65; }
+}
+@media(prefers-reduced-motion:reduce){
+  .rolling .dieShadow{animation-duration:2s!important}
+}

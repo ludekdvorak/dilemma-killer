@@ -94,9 +94,12 @@ export function rollDice(players: Player[], random: RandomSource = Math.random):
     .map(({ roll }, index) => ({ roll, index }))
     .filter(({ roll }) => roll === highestRoll)
     .map(({ index }) => index);
-  const winnerIndex = topIndexes[randomIndex(topIndexes.length, random)];
 
-  return { rolls, winner: players[winnerIndex], winnerIndex };
+  return {
+    rolls,
+    winners: topIndexes.map((index) => players[index]),
+    winnerIndexes: topIndexes,
+  };
 }
 
 export function drawCard(players: Player[], random: RandomSource = Math.random): CardResult {

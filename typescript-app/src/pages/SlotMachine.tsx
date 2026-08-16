@@ -24,9 +24,22 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
+  const leverReturnRef = useRef<number | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const idleIndexRef = useRef(Math.floor(Math.random() * players.length));
   const lockedReelsRef = useRef(0);
+  const leverProgressRef = useRef(0);
+  const leverStartYRef = useRef(0);
+  const leverDraggedRef = useRef(false);
+  const leverDraggingRef = useRef(false);
+  const [leverProgress, setLeverProgress] = useState(0);
+  const [leverDragging, setLeverDragging] = useState(false);
+
+  const updateLeverProgress = (progress: number) => {
+    const next = Math.min(1, Math.max(0, progress));
+    leverProgressRef.current = next;
+    setLeverProgress(next);
+  };
 
   const clearTimers = () => {
     if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
@@ -50,10 +63,11 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
 
   useEffect(() => () => {
     clearTimers();
+    if (leverReturnRef.current !== null) window.clearTimeout(leverReturnRef.current);
     controllerRef.current?.abort();
   }, []);
 
-  const handleSpin = async () => {
+  const handleSpin = async (pulledByLever = false) => {
     if (spinning) return;
     clearTimers();
     controllerRef.current?.abort();
@@ -63,6 +77,12 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
     lockedReelsRef.current = 0;
     setWinner(null);
     setError(null);
+    if (!pulledByLever) updateLeverProgress(1);
+    if (leverReturnRef.current !== null) window.clearTimeout(leverReturnRef.current);
+    leverReturnRef.current = window.setTimeout(() => {
+      updateLeverProgress(0);
+      leverReturnRef.current = null;
+    }, 520);
 
     try {
       const result = await spinSlots(players, controller.signal);
@@ -98,6 +118,38 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
     }
   };
 
+  const handleLeverPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (spinning) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    leverDraggingRef.current = true;
+    leverDraggedRef.current = false;
+    leverStartYRef.current = event.clientY;
+    setLeverDragging(true);
+    updateLeverProgress(0);
+  };
+
+  const handleLeverPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!leverDraggingRef.current || spinning) return;
+    const distance = Math.max(0, event.clientY - leverStartYRef.current);
+    if (distance > 4) leverDraggedRef.current = true;
+    updateLeverProgress(distance / 112);
+  };
+
+  const finishLeverPull = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!leverDraggingRef.current) return;
+    leverDraggingRef.current = false;
+    setLeverDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (leverProgressRef.current >= 0.72) {
+      updateLeverProgress(1);
+      void handleSpin(true);
+    } else {
+      updateLeverProgress(0);
+    }
+  };
+
   return (
     <main className={styles.page}>
       <header className={styles.topBar}>
@@ -126,13 +178,28 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
           <div className={styles.lights}>{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</div>
         </div>
         <button
-          className={`${styles.lever} ${spinning ? styles.leverPulled : ''}`}
-          onClick={() => void handleSpin()}
+          className={`${styles.lever} ${leverProgress > 0 ? styles.leverPulled : ''} ${leverDragging ? styles.leverDragging : ''}`}
+          onPointerDown={handleLeverPointerDown}
+          onPointerMove={handleLeverPointerMove}
+          onPointerUp={finishLeverPull}
+          onPointerCancel={finishLeverPull}
+          onClick={() => {
+            if (leverDraggedRef.current) {
+              leverDraggedRef.current = false;
+              return;
+            }
+            void handleSpin();
+          }}
           disabled={spinning}
-          aria-label="Pull the slot-machine lever"
+          aria-label="Pull the slot-machine lever down to spin"
         >
-          <span className={styles.leverKnob} />
+          <span className={styles.leverTrack} />
           <span className={styles.leverArm} />
+          <span
+            className={styles.leverKnob}
+            style={{ transform: `translateY(${leverProgress * 112}px)` }}
+          />
+          <span className={styles.leverHint}>PULL</span>
         </button>
       </section>
 
