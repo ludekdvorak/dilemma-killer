@@ -2,6 +2,7 @@ node_modules/
 dist/
 build/
 coverage/
+.netlify/
 .env
 .env.local
 *.log

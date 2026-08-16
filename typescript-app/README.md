@@ -67,13 +67,23 @@ npm run test:integration  # real PostgreSQL auth, ownership, and statistics test
 
 ### Netlify
 
-The repository includes `netlify.toml` and a `serverless-http` wrapper around the existing Express application. The `/api/*` rewrite runs `netlify/functions/api.mts`; all other routes fall back to the React application.
+The repository root includes `netlify.toml` and the application includes a `serverless-http` wrapper around the existing Express application. The `/api/*` rewrite runs `netlify/functions/api.mts`; all other routes fall back to the React application.
 
-1. Set the Netlify base directory to `typescript-app`.
-2. Leave the build command and publish directory to `netlify.toml` (`npm run build:netlify` and `dist`).
+1. Connect Netlify to this Git repository. The root `netlify.toml` sets the base directory to `typescript-app`.
+2. Leave the build command and publish directory to `netlify.toml` (`npm run build:netlify` and `dist`). Do not deploy by uploading only the generated `dist` directory because that omits the API function.
 3. Create a managed PostgreSQL database that accepts connections from Netlify Functions. Prefer the provider's pooled connection URL when one is available.
 4. In **Netlify → Site configuration → Environment variables**, add the runtime values below. Do not put secrets in `netlify.toml`.
 5. Trigger a new deploy, then verify `https://your-site.example/api/health` and `https://your-site.example/api/ready`.
+
+For a manual deployment, use the Netlify CLI from the repository root so the function and redirects are uploaded together:
+
+```bash
+npx netlify-cli@latest login
+npx netlify-cli@latest link
+npx netlify-cli@latest deploy --prod
+```
+
+Uploading or dragging only `typescript-app/dist` deploys the frontend but cannot deploy the API function.
 
 Required Netlify runtime configuration:
 
