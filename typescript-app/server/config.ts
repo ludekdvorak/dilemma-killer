@@ -1,25 +1,32 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
+function optionalEnvironmentValue<T extends z.ZodType>(schema: T) {
+  return z.preprocess(
+    (value) => typeof value === 'string' && value.trim() === '' ? undefined : value,
+    schema.optional(),
+  );
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65_535).default(8080),
   HOST: z.string().min(1).default('0.0.0.0'),
-  DATABASE_URL: z.string().min(1).optional(),
+  DATABASE_URL: optionalEnvironmentValue(z.string().min(1)),
   DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(50).default(10),
   DATABASE_SSL: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
   DATABASE_SSL_REJECT_UNAUTHORIZED: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   DATABASE_CONNECTION_TIMEOUT_MS: z.coerce.number().int().min(100).max(60_000).default(5_000),
   DATABASE_QUERY_TIMEOUT_MS: z.coerce.number().int().min(100).max(120_000).default(15_000),
-  JWT_SECRET: z.string().optional(),
+  JWT_SECRET: optionalEnvironmentValue(z.string()),
   JWT_EXPIRATION_SECONDS: z.coerce.number().int().min(300).default(604_800),
-  ALLOW_MOCK_UPGRADE: z.enum(['true', 'false']).optional(),
+  ALLOW_MOCK_UPGRADE: optionalEnvironmentValue(z.enum(['true', 'false'])),
   RUN_MIGRATIONS_ON_START: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
-  APP_BASE_URL: z.string().url().optional(),
-  GOPAY_GOID: z.string().min(1).optional(),
-  GOPAY_CLIENT_ID: z.string().min(1).optional(),
-  GOPAY_CLIENT_SECRET: z.string().min(1).optional(),
+  APP_BASE_URL: optionalEnvironmentValue(z.string().url()),
+  GOPAY_GOID: optionalEnvironmentValue(z.string().min(1)),
+  GOPAY_CLIENT_ID: optionalEnvironmentValue(z.string().min(1)),
+  GOPAY_CLIENT_SECRET: optionalEnvironmentValue(z.string().min(1)),
   GOPAY_GATEWAY_URL: z.string().url().default('https://gw.sandbox.gopay.com/api'),
 });
 
