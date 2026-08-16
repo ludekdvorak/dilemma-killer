@@ -66,8 +66,8 @@ export interface PlayerRoll {
 
 export interface DiceResult {
   rolls: PlayerRoll[];
-  winner: Player;
-  winnerIndex: number;
+  winners: Player[];
+  winnerIndexes: number[];
 }
 
 export interface CardResult {

@@ -43,7 +43,7 @@ export default function Dice3D({
   const safeValue = Math.min(6, Math.max(1, Math.round(value)));
   return (
     <div
-      className={`${styles.scene} ${floating ? styles.floating : ''}`}
+      className={`${styles.scene} ${floating ? styles.floating : ''} ${rolling ? styles.sceneRolling : ''}`}
       style={{
         '--die-size': `${size}px`,
         '--die-rotation': ROTATIONS[safeValue],

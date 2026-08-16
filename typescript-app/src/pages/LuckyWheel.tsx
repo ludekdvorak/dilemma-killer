@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { Player, SpinResult } from '../../shared/contracts';
 import { ApiRequestError, spinWheel } from '../api';
-import { prefersReducedMotion } from '../motion';
 import styles from './LuckyWheel.module.css';
 
 const SEGMENT_COLORS = [
@@ -14,6 +13,11 @@ interface LuckyWheelProps {
   players: Player[];
   onBack: () => void;
 }
+
+type WinnerStyle = CSSProperties & {
+  '--winner-color': string;
+  '--winner-color-soft': string;
+};
 
 function drawWheel(canvas: HTMLCanvasElement, players: Player[], rotationAngle: number): void {
   const context = canvas.getContext('2d');
@@ -75,7 +79,7 @@ function drawWheel(canvas: HTMLCanvasElement, players: Player[], rotationAngle: 
 function localSpin(players: Player[]): SpinResult {
   const winnerIndex = Math.floor(Math.random() * players.length);
   const segment = 360 / players.length;
-  const fullTurns = (5 + Math.floor(Math.random() * 5)) * 360;
+  const fullTurns = (16 + Math.floor(Math.random() * 16)) * 360;
   const target = 360 - (winnerIndex * segment + segment / 2);
   return {
     winner: players[winnerIndex],
@@ -88,14 +92,15 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const requestControllerRef = useRef<AbortController | null>(null);
+  const angleRef = useRef(0);
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<Player | null>(null);
-  const [currentAngle, setCurrentAngle] = useState(0);
+  const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current) drawWheel(canvasRef.current, players, currentAngle);
-  }, [currentAngle, players]);
+    if (canvasRef.current) drawWheel(canvasRef.current, players, angleRef.current);
+  }, [players]);
 
   useEffect(() => () => {
     if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
@@ -106,6 +111,7 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
     if (spinning) return;
     setSpinning(true);
     setWinner(null);
+    setWinnerIndex(null);
     setError(null);
     requestControllerRef.current?.abort();
     const controller = new AbortController();
@@ -125,31 +131,31 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
       setError('Server unavailable — using a local result. This play will not be counted.');
     }
 
-    const startAngle = currentAngle;
+    const startAngle = angleRef.current;
     const currentDegrees = ((startAngle * 180 / Math.PI) % 360 + 360) % 360;
     const finalDegrees = ((result.rotationDegrees % 360) + 360) % 360;
     const alignmentDegrees = (finalDegrees - currentDegrees + 360) % 360;
-    const fullTurns = Math.max(5, Math.floor(result.rotationDegrees / 360)) * 360;
+    // Keep nearly the same rotation rate while shortening the overall spin.
+    const fullTurns = 5 * 360;
     const endAngle = startAngle + (fullTurns + alignmentDegrees) * Math.PI / 180;
-    if (prefersReducedMotion()) {
-      setCurrentAngle(endAngle % (2 * Math.PI));
-      setSpinning(false);
-      setWinner(result.winner);
-      return;
-    }
-    const duration = 4500;
+    const duration = 8000;
     const startTime = performance.now();
     const easeOut = (progress: number) => 1 - Math.pow(1 - progress, 4);
 
     const animate = (now: number) => {
       const progress = Math.min((now - startTime) / duration, 1);
-      setCurrentAngle(startAngle + (endAngle - startAngle) * easeOut(progress));
+      const angle = startAngle + (endAngle - startAngle) * easeOut(progress);
+      angleRef.current = angle;
+      if (canvasRef.current) drawWheel(canvasRef.current, players, angle);
       if (progress < 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
-        setCurrentAngle(endAngle % (2 * Math.PI));
+        angleRef.current = endAngle % (2 * Math.PI);
+        if (canvasRef.current) drawWheel(canvasRef.current, players, angleRef.current);
+        animationFrameRef.current = null;
         setSpinning(false);
         setWinner(result.winner);
+        setWinnerIndex(result.winnerIndex);
       }
     };
     animationFrameRef.current = requestAnimationFrame(animate);
@@ -191,8 +197,16 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
         />
       </div>
 
-      {winner && !spinning && (
-        <div className={styles.winnerBanner} role="status" aria-live="polite">
+      {winner && winnerIndex !== null && !spinning && (
+        <div
+          className={styles.winnerBanner}
+          role="status"
+          aria-live="polite"
+          style={{
+            '--winner-color': SEGMENT_COLORS[winnerIndex % SEGMENT_COLORS.length],
+            '--winner-color-soft': `${SEGMENT_COLORS[winnerIndex % SEGMENT_COLORS.length]}66`,
+          } as WinnerStyle}
+        >
           <div className={styles.winnerLabel}>THE WHEEL HAS SPOKEN</div>
           <div className={styles.winnerName}>{winner.name}</div>
           <div className={styles.confetti}>🎉</div>

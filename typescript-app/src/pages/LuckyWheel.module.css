@@ -47,18 +47,19 @@
 
 .winnerBanner {
   background: linear-gradient(145deg,rgba(20,17,39,.94),rgba(8,8,18,.95));
-  border: 1.5px solid rgba(255,209,102,0.4);
+  border: 1.5px solid var(--winner-color-soft, rgba(255,209,102,0.4));
   border-radius: 16px;
   padding: 1.2rem 2.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 34px color-mix(in srgb, var(--winner-color, #ffd166) 18%, transparent);
   animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.winnerBanner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse, rgba(255,209,102,0.08), transparent 70%); }
+.winnerBanner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse, var(--winner-color-soft, rgba(255,209,102,0.08)), transparent 70%); opacity:.18; }
 @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-.winnerLabel { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; color: var(--accent2); margin-bottom: 0.3rem; }
-.winnerName { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); color: var(--accent2); line-height: 1; max-width: min(75vw, 420px); overflow-wrap: anywhere; }
+.winnerLabel { position:relative; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; color: var(--winner-color, var(--accent2)); margin-bottom: 0.3rem; }
+.winnerName { position:relative; font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); color: var(--winner-color, var(--accent2)); text-shadow:0 0 22px var(--winner-color-soft, rgba(34,211,238,.4)); line-height: 1; max-width: min(75vw, 420px); overflow-wrap: anywhere; }
 .confetti { font-size: 1.5rem; position: absolute; top: 0.5rem; right: 1rem; animation: bounce 0.6s ease infinite alternate; }
 @keyframes bounce { to { transform: translateY(-4px) rotate(15deg); } }
 
@@ -87,3 +88,8 @@
 .spinBtn:disabled { cursor: default; }
 .spinBtn.spinning { background: linear-gradient(135deg, #555, #444); box-shadow: none; animation: pulse 1s ease infinite; }
 @keyframes pulse { 50% { opacity: 0.7; } }
+@media(prefers-reduced-motion:reduce){
+  .winnerBanner{animation-duration:.25s!important}
+  .confetti{animation:none!important}
+  .spinBtn.spinning{animation-duration:1s!important;animation-iteration-count:infinite!important}
+}

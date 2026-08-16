@@ -3,6 +3,8 @@
   height: var(--die-size);
   perspective: calc(var(--die-size) * 5);
   flex: 0 0 auto;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 18px 18px rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(34,211,238,.24));
 }
 .cube {
   width: 100%;
@@ -12,12 +14,16 @@
   -webkit-transform-style: preserve-3d;
   transform: var(--die-rotation);
   transition: transform .7s cubic-bezier(.18,.85,.2,1.15);
-  filter: drop-shadow(0 18px 18px rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(34,211,238,.24));
+  will-change: transform;
 }
 .floating { animation: float 3.8s ease-in-out infinite; }
+.sceneRolling {
+  filter: none;
+  animation: dieThrow 2s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
 .floating .cube { animation: idleTurn 9s ease-in-out infinite; }
-.cube.rolling { animation: tumble .24s linear infinite; }
-.floating .cube.rolling { animation: tumble .24s linear infinite; }
+.cube.rolling { transition: none; animation: tumble 4.5s linear infinite; }
+.floating .cube.rolling { animation: tumble 4.5s linear infinite; }
 .face {
   position: absolute;
   inset: 0;
@@ -27,7 +33,7 @@
   padding: 15%;
   gap: 8%;
   border: 1px solid rgba(255,255,255,.72);
-  border-radius: 18%;
+  border-radius: 10%;
   background:
     linear-gradient(145deg,rgba(255,255,255,.98),rgba(198,214,236,.92));
   box-shadow:
@@ -57,9 +63,19 @@
   50% { transform:rotateX(18deg) rotateY(28deg) rotateZ(6deg); }
 }
 @keyframes tumble {
-  to { transform:rotateX(360deg) rotateY(540deg) rotateZ(180deg); }
+  0% { transform:rotateX(-12deg) rotateY(-18deg) rotateZ(0deg); }
+  25% { transform:rotateX(78deg) rotateY(72deg) rotateZ(3deg); }
+  50% { transform:rotateX(168deg) rotateY(162deg) rotateZ(0deg); }
+  75% { transform:rotateX(258deg) rotateY(252deg) rotateZ(-3deg); }
+  100% { transform:rotateX(348deg) rotateY(342deg) rotateZ(0deg); }
+}
+@keyframes dieThrow {
+  from { transform:translate3d(0,9px,0) scale(.96); }
+  to { transform:translate3d(0,-17px,0) scale(1.04); }
 }
 @media(prefers-reduced-motion:reduce){
   .floating{animation-duration:3.8s!important;animation-iteration-count:infinite!important}
   .floating .cube{animation-duration:9s!important;animation-iteration-count:infinite!important}
+  .sceneRolling{animation-duration:2s!important}
+  .cube.rolling,.floating .cube.rolling{animation-duration:4.5s!important}
 }

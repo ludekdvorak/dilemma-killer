@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
@@ -15,13 +14,19 @@ import { paymentsRouter } from './routes/payments.js';
 import { playersRouter } from './routes/players.js';
 import { statisticsRouter } from './routes/statistics.js';
 
-export function createApp() {
+interface CreateAppOptions {
+  serveFrontend?: boolean;
+  clientDirectory?: string;
+}
+
+export function createApp({
+  serveFrontend = true,
+  clientDirectory = path.resolve(process.cwd(), 'dist'),
+}: CreateAppOptions = {}) {
   const app = express();
-  const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
-  const clientDirectory = path.resolve(moduleDirectory, '../dist');
   const clientIndex = path.join(clientDirectory, 'index.html');
 
-  if (config.isProduction && !existsSync(clientIndex)) {
+  if (serveFrontend && config.isProduction && !existsSync(clientIndex)) {
     throw new Error(`Production frontend is missing at ${clientIndex}. Run the build before starting.`);
   }
 
@@ -82,7 +87,7 @@ export function createApp() {
   app.use('/api/payments', paymentsRouter);
   app.use('/api', notFound);
 
-  if (existsSync(clientDirectory)) {
+  if (serveFrontend && existsSync(clientDirectory)) {
     app.use(express.static(clientDirectory, {
       index: false,
       setHeaders(response, filePath) {
