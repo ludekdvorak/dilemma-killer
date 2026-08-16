@@ -1,4 +1,6 @@
+import type { HandlerResponse } from '@netlify/functions';
 import request from 'supertest';
+import serverless from 'serverless-http';
 import { afterAll, describe, expect, it } from 'vitest';
 import { createApp } from './app.js';
 import { pool } from './db/pool.js';
@@ -63,5 +65,30 @@ describe('public API', () => {
       .post('/api/games/dice/roll')
       .send({ payload: 'x'.repeat(40_000) })
       .expect(413, { message: 'Request body is too large' });
+  });
+
+  it('handles authentication requests from a legacy Netlify Function event', async () => {
+    const handler = serverless(app);
+    const body = JSON.stringify({
+      email: 'not-an-email',
+      password: 'diagnostic-password',
+    });
+    const response = await handler({
+      path: '/api/auth/login',
+      httpMethod: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'content-length': String(Buffer.byteLength(body)),
+        'x-forwarded-for': '203.0.113.10',
+        'x-nf-client-connection-ip': '203.0.113.10',
+      },
+      body,
+      isBase64Encoded: false,
+    }, {}) as HandlerResponse;
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body ?? '')).toEqual({
+      message: 'email: Enter a valid email address',
+    });
   });
 });
