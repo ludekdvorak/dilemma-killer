@@ -1,0 +1,20 @@
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.4rem 1.5rem 3rem;gap:1.7rem}
+.header{width:100%;max-width:1000px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.55rem}
+.backBtn{align-self:flex-start;background:rgba(8,8,18,.75);border:1px solid var(--border);border-radius:11px;color:var(--text-muted);padding:.55rem 1rem}.backBtn:hover{color:var(--text);border-color:var(--accent)}
+.logo{font:700 .7rem var(--font-display);letter-spacing:.14em;color:#b79cff}
+.avatar{width:66px;height:66px;display:grid;place-items:center;border:1px solid #a57cff;border-radius:20px;background:linear-gradient(145deg,#8856ff,#2d1b62);font:900 1.7rem var(--font-display);box-shadow:0 0 30px rgba(139,92,246,.35)}
+.header h1{font:900 clamp(2.4rem,6vw,4.4rem)/1 var(--font-display);letter-spacing:-.05em}.header h1 span{color:var(--accent2);text-shadow:0 0 26px rgba(34,211,238,.35)}.header>p{color:var(--text-muted);font-size:.82rem}
+.grid{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;align-items:start}
+.card{display:flex;flex-direction:column;gap:.8rem;padding:1.25rem;border:1px solid var(--border);border-radius:20px;background:linear-gradient(145deg,rgba(20,17,39,.94),rgba(8,8,18,.92));box-shadow:0 20px 50px rgba(0,0,0,.28)}
+.cardHeading{display:flex;align-items:center;gap:.8rem;margin-bottom:.3rem}.cardHeading>span{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(139,92,246,.4);border-radius:10px;color:#b79cff;font:700 .65rem var(--font-display)}.cardHeading h2{font:800 .8rem var(--font-display);letter-spacing:.08em}.cardHeading p{color:var(--text-muted);font-size:.7rem;margin-top:.2rem}
+.card label{display:flex;flex-direction:column;gap:.35rem;color:var(--text-muted);font-size:.68rem;font-weight:700;letter-spacing:.04em}
+.card input{height:47px;border:1px solid var(--border);border-radius:11px;background:#080713;color:var(--text);padding:0 .85rem;outline:none}.card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+.primaryBtn,.goldBtn{border-radius:11px;padding:.85rem 1rem;font:800 .68rem var(--font-display);letter-spacing:.08em}
+.primaryBtn{border:1px solid #a882ff;background:linear-gradient(135deg,#8f60ff,#6635dc);color:white}.primaryBtn:hover:not(:disabled),.goldBtn:hover{transform:translateY(-2px)}.primaryBtn:disabled{opacity:.5}
+.premiumCard{grid-column:1/-1;align-items:center;text-align:center;background:radial-gradient(circle at 50% 0,rgba(255,194,59,.15),transparent 44%),linear-gradient(145deg,rgba(28,20,30,.96),rgba(9,8,17,.94))}
+.premiumCard .cardHeading{align-self:flex-start;text-align:left}.price{display:flex;align-items:baseline;gap:.35rem}.price strong{font:900 3.5rem var(--font-display);color:#ffd05a;text-shadow:0 0 20px rgba(255,188,50,.35)}.price span{color:var(--text-muted)}
+.goldBtn{border:1px solid #ffe184;background:linear-gradient(135deg,#ffd760,#d9911a);color:#271700;min-width:240px}
+.success{color:var(--accent3);font-size:.75rem}.error{color:var(--danger);font-size:.75rem}.muted{color:var(--text-muted);font-size:.78rem}
+.signOut{background:none;border:0;color:var(--text-muted);font-size:.75rem}.signOut:hover{color:var(--danger)}
+.cancelBtn{background:none;border:0;color:var(--text-muted);font-size:.68rem;text-decoration:underline}.cancelBtn:hover{color:var(--danger)}.cancelBtn:disabled{opacity:.45}
+@media(max-width:700px){.page{padding:1rem}.grid{grid-template-columns:1fr}.premiumCard{grid-column:auto}}
