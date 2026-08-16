@@ -17,5 +17,5 @@
     "jsx": "react-jsx",
     "types": ["node", "vite/client", "vitest/globals"]
   },
-  "include": ["src", "server", "shared", "vite.config.ts", "vitest.config.ts", "vitest.integration.config.ts", "tsup.config.ts"]
+  "include": ["src", "server", "shared", "netlify", "vite.config.ts", "vitest.config.ts", "vitest.integration.config.ts", "tsup.config.ts"]
 }

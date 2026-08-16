@@ -7,10 +7,10 @@ This is a separate, English, full-stack TypeScript version of Dilemma Killer. Th
 - React 19 + Vite + TypeScript
 - Node.js + Express + TypeScript
 - PostgreSQL 16
-- One npm package and one production web service
+- Netlify Functions support through the existing Express application
 - Vitest and Supertest
 
-Express serves both the API and the compiled React application in production. The only separate production dependency is PostgreSQL.
+The same Express application can run as a conventional Node.js service or inside a Netlify Function. PostgreSQL remains the only separate production dependency.
 
 ## Features
 
@@ -57,6 +57,7 @@ npm run dev          # React and API development servers
 npm run typecheck    # strict TypeScript checks
 npm test             # unit and API tests; no database required
 npm run build        # checks, tests, and production bundles
+npm run build:netlify # checks, tests, and builds the Netlify frontend
 npm start            # production server; run build first
 npm run db:migrate   # apply PostgreSQL migrations manually
 npm run test:integration  # real PostgreSQL auth, ownership, and statistics tests
@@ -64,7 +65,33 @@ npm run test:integration  # real PostgreSQL auth, ownership, and statistics test
 
 ## Production deployment
 
-The simplest deployment is:
+### Netlify
+
+The repository includes `netlify.toml` and a `serverless-http` wrapper around the existing Express application. The `/api/*` rewrite runs `netlify/functions/api.mts`; all other routes fall back to the React application.
+
+1. Set the Netlify base directory to `typescript-app`.
+2. Leave the build command and publish directory to `netlify.toml` (`npm run build:netlify` and `dist`).
+3. Create a managed PostgreSQL database that accepts connections from Netlify Functions. Prefer the provider's pooled connection URL when one is available.
+4. In **Netlify → Site configuration → Environment variables**, add the runtime values below. Do not put secrets in `netlify.toml`.
+5. Trigger a new deploy, then verify `https://your-site.example/api/health` and `https://your-site.example/api/ready`.
+
+Required Netlify runtime configuration:
+
+```dotenv
+DATABASE_URL=postgresql://...
+JWT_SECRET=<output-of-openssl-rand-base64-48>
+RUN_MIGRATIONS_ON_START=true
+```
+
+The function forces production mode when deployed, caps each warm function instance to two PostgreSQL connections, and runs migrations once per warm instance. Migrations use the existing PostgreSQL advisory lock, so simultaneous cold starts cannot apply the same migration twice. For a busier deployment, run migrations as a separate deploy/release task and set `RUN_MIGRATIONS_ON_START=false`.
+
+Set `DATABASE_SSL=true` if your database provider requires TLS. Keep `DATABASE_SSL_REJECT_UNAUTHORIZED=true` when it supplies a trusted certificate. Set `APP_BASE_URL` to the public Netlify URL and add the GoPay variables if payments should be enabled.
+
+Netlify environment variables must be configured through the UI, CLI, or API with Functions access; values placed only in `netlify.toml` are not available to functions at runtime.
+
+### Conventional Node.js service
+
+To deploy the same application as a long-running service instead:
 
 1. Create one managed PostgreSQL database.
 2. Create one Node.js web service with `typescript-app` as its root directory.
