@@ -1,5 +1,6 @@
-import { Router, type Response } from 'express';
-import rateLimit from 'express-rate-limit';
+import { isIP } from 'node:net';
+import { Router, type Request, type Response } from 'express';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { compare, hash } from 'bcryptjs';
 import { z } from 'zod';
 import { createToken, mapUserRow, requireAuth, toUserProfile, type CurrentUser } from '../auth.js';
@@ -43,11 +44,29 @@ const passwordChangeSchema = z.object({
   newPassword: passwordSchema,
 });
 
+function firstValidIp(value: string | undefined): string | undefined {
+  return value
+    ?.split(',')
+    .map((candidate) => candidate.trim())
+    .find((candidate) => isIP(candidate) !== 0);
+}
+
+function authenticationRateLimitKey(request: Request): string {
+  // serverless-http does not populate Express's socket address for legacy
+  // Netlify events. Netlify provides the connecting IP in this protected header.
+  const clientIp = firstValidIp(request.ip)
+    ?? firstValidIp(request.get('x-nf-client-connection-ip'))
+    ?? firstValidIp(request.get('x-forwarded-for'));
+
+  return clientIp ? ipKeyGenerator(clientIp) : 'unidentified-client';
+}
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  keyGenerator: authenticationRateLimitKey,
   message: { message: 'Too many authentication attempts. Please try again later.' },
 });
 
