@@ -53,6 +53,65 @@ const migrations: Migration[] = [
         ON game_plays(user_id, game_id);
     `,
   },
+  {
+    version: 2,
+    name: 'groups_profiles_slots_and_payments',
+    sql: `
+      ALTER TABLE users
+        ADD COLUMN premium_expires_at TIMESTAMPTZ;
+
+      CREATE TABLE saved_groups (
+        id BIGSERIAL PRIMARY KEY,
+        owner_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name VARCHAR(40) NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT saved_groups_name_not_blank CHECK (LENGTH(BTRIM(name)) > 0)
+      );
+
+      CREATE UNIQUE INDEX saved_groups_owner_name_unique_idx
+        ON saved_groups(owner_id, LOWER(name));
+      CREATE INDEX saved_groups_owner_updated_idx
+        ON saved_groups(owner_id, updated_at DESC);
+
+      CREATE TABLE saved_group_members (
+        id BIGSERIAL PRIMARY KEY,
+        group_id BIGINT NOT NULL REFERENCES saved_groups(id) ON DELETE CASCADE,
+        name VARCHAR(20) NOT NULL,
+        position SMALLINT NOT NULL,
+        CONSTRAINT saved_group_members_name_not_blank CHECK (LENGTH(BTRIM(name)) > 0),
+        CONSTRAINT saved_group_members_position_valid CHECK (position BETWEEN 0 AND 49),
+        UNIQUE (group_id, position)
+      );
+
+      CREATE INDEX saved_group_members_group_position_idx
+        ON saved_group_members(group_id, position ASC);
+
+      ALTER TABLE game_plays
+        DROP CONSTRAINT game_plays_known_game;
+      ALTER TABLE game_plays
+        ADD CONSTRAINT game_plays_known_game
+        CHECK (game_id IN ('wheel', 'dice', 'slots', 'cards'));
+
+      CREATE TABLE payment_orders (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        order_number TEXT NOT NULL UNIQUE,
+        provider_payment_id TEXT UNIQUE,
+        amount_minor INTEGER NOT NULL,
+        currency CHAR(3) NOT NULL,
+        state VARCHAR(32) NOT NULL DEFAULT 'CREATED',
+        error_message TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT payment_orders_amount_positive CHECK (amount_minor > 0),
+        CONSTRAINT payment_orders_currency_uppercase CHECK (currency = UPPER(currency))
+      );
+
+      CREATE INDEX payment_orders_user_created_idx
+        ON payment_orders(user_id, created_at DESC);
+    `,
+  },
 ];
 
 const migrationLockId = 1_947_260_314;

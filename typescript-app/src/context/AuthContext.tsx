@@ -17,6 +17,9 @@ interface AuthContextValue {
   register: (email: string, password: string, displayName: string, signal?: AbortSignal) => Promise<void>;
   logout: () => Promise<void>;
   upgradeToPremium: () => Promise<void>;
+  updateProfile: (email: string, displayName: string, currentPassword?: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -58,6 +61,22 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setUser(await api.upgradeToPremium());
   }, []);
 
+  const updateProfile = useCallback(async (
+    email: string,
+    displayName: string,
+    currentPassword?: string,
+  ) => {
+    setUser(await api.updateProfile(email, displayName, currentPassword));
+  }, []);
+
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    await api.changePassword(currentPassword, newPassword);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    setUser(await api.me());
+  }, []);
+
   const value = useMemo<AuthContextValue>(() => ({
     user,
     loading,
@@ -65,7 +84,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
     register,
     logout,
     upgradeToPremium,
-  }), [user, loading, login, register, logout, upgradeToPremium]);
+    updateProfile,
+    changePassword,
+    refreshUser,
+  }), [
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    upgradeToPremium,
+    updateProfile,
+    changePassword,
+    refreshUser,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

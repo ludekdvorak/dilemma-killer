@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2.5rem 1.5rem;
+  padding: 1.5rem 1.5rem 3rem;
   gap: 2.5rem;
 }
 .topBar { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 700px; }
@@ -11,7 +11,7 @@
   align-self: flex-start;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 11px;
   color: var(--text-muted);
   font-size: 0.85rem;
   padding: 0.5rem 1rem;
@@ -19,29 +19,22 @@
 .backBtn:hover { color: var(--text); border-color: var(--text-muted); }
 .logo {
   font-family: var(--font-display);
-  font-size: 1rem;
-  letter-spacing: 0.25em;
-  color: var(--accent2);
-  background: rgba(255,209,102,0.08);
-  border: 1px solid rgba(255,209,102,0.25);
-  padding: 0.35rem 1rem;
-  border-radius: 100px;
+  font-size: .7rem; letter-spacing:.14em; color:#b79cff;
 }
-.gameTitle { font-family: var(--font-display); font-size: 2rem; font-weight: 400; letter-spacing: 0.05em; }
+.gameTitle { font-family:var(--font-display);font-size:2rem;font-weight:800;letter-spacing:.05em;text-shadow:0 0 25px rgba(34,211,238,.32) }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; width: 100%; max-width: 700px; }
 .playerDie {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: var(--surface);
+  background: linear-gradient(145deg,rgba(20,17,39,.9),rgba(8,8,18,.92));
   border: 1.5px solid var(--border);
   border-radius: 16px;
   padding: 1.2rem 1rem;
   transition: border-color 0.2s, transform 0.2s;
 }
-.playerDie.winner { border-color: var(--accent2); transform: scale(1.05); box-shadow: 0 4px 24px rgba(255,209,102,0.35); }
-.face { font-size: 3rem; line-height: 1; }
+.playerDie.winner { border-color: var(--accent2); transform: scale(1.05); box-shadow: 0 4px 30px rgba(34,211,238,.35),inset 0 0 24px rgba(34,211,238,.08); }
 .playerName { font-size: 0.9rem; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
 .winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
 .winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
@@ -58,10 +51,10 @@
 }
 .errorNote { color: var(--danger); font-size: 0.85rem; }
 .rollBtn {
-  background: linear-gradient(135deg, var(--accent2), #ffb347);
+  background: linear-gradient(135deg, #45e1f4, #0aaac6);
   border: none;
   border-radius: 12px;
-  color: #1a1400;
+  color: #031518;
   font-family: var(--font-display);
   font-size: 1.2rem;
   letter-spacing: 0.08em;

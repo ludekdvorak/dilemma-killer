@@ -14,6 +14,7 @@ interface UserWithPasswordRow {
   password_hash: string;
   display_name: string;
   premium: boolean;
+  premium_expires_at: Date | null;
   created_at: Date;
 }
 
@@ -29,6 +30,17 @@ const loginSchema = z.object({
     (password) => Buffer.byteLength(password, 'utf8') <= 72,
     'Password is too long',
   ),
+});
+
+const profileSchema = z.object({
+  email: emailSchema,
+  displayName: z.string().trim().min(1, 'Display name is required').max(30),
+  currentPassword: z.string().optional(),
+});
+
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: passwordSchema,
 });
 
 const authLimiter = rateLimit({
@@ -57,7 +69,7 @@ authRouter.post('/register', authLimiter, async (request, response) => {
   const result = await pool.query<UserWithPasswordRow>(
     `INSERT INTO users (email, password_hash, display_name)
      VALUES ($1, $2, $3)
-     RETURNING id, email, password_hash, display_name, premium, created_at`,
+     RETURNING id, email, password_hash, display_name, premium, premium_expires_at, created_at`,
     [input.email, passwordHash, input.displayName],
   );
   const user = mapUserRow(result.rows[0]);
@@ -68,7 +80,7 @@ authRouter.post('/register', authLimiter, async (request, response) => {
 authRouter.post('/login', authLimiter, async (request, response) => {
   const input = loginSchema.parse(request.body);
   const result = await pool.query<UserWithPasswordRow>(
-    `SELECT id, email, password_hash, display_name, premium, created_at
+    `SELECT id, email, password_hash, display_name, premium, premium_expires_at, created_at
      FROM users
      WHERE email = $1`,
     [input.email],
@@ -96,6 +108,47 @@ authRouter.get('/me', requireAuth, (request, response) => {
   response.json(toUserProfile(request.user!));
 });
 
+authRouter.patch('/profile', requireAuth, async (request, response) => {
+  const input = profileSchema.parse(request.body);
+  const current = await pool.query<UserWithPasswordRow>(
+    `SELECT id, email, password_hash, display_name, premium, premium_expires_at, created_at
+     FROM users
+     WHERE id = $1`,
+    [request.user!.id],
+  );
+  const row = current.rows[0];
+  if (input.email !== row.email) {
+    if (!input.currentPassword || !(await compare(input.currentPassword, row.password_hash))) {
+      throw new HttpError(401, 'Current password is required to change your email');
+    }
+  }
+
+  const result = await pool.query<UserWithPasswordRow>(
+    `UPDATE users
+     SET email = $2, display_name = $3
+     WHERE id = $1
+     RETURNING id, email, password_hash, display_name, premium, premium_expires_at, created_at`,
+    [request.user!.id, input.email, input.displayName],
+  );
+  response.json(toUserProfile(mapUserRow(result.rows[0])));
+});
+
+authRouter.post('/password', authLimiter, requireAuth, async (request, response) => {
+  const input = passwordChangeSchema.parse(request.body);
+  const current = await pool.query<Pick<UserWithPasswordRow, 'password_hash'>>(
+    'SELECT password_hash FROM users WHERE id = $1',
+    [request.user!.id],
+  );
+  if (!(await compare(input.currentPassword, current.rows[0].password_hash))) {
+    throw new HttpError(401, 'Current password is incorrect');
+  }
+  await pool.query(
+    'UPDATE users SET password_hash = $2 WHERE id = $1',
+    [request.user!.id, await hash(input.newPassword, 12)],
+  );
+  response.status(204).end();
+});
+
 authRouter.post('/upgrade', requireAuth, async (request, response) => {
   if (!config.allowMockUpgrade) {
     throw new HttpError(403, 'Demo premium upgrades are disabled');
@@ -104,7 +157,7 @@ authRouter.post('/upgrade', requireAuth, async (request, response) => {
     `UPDATE users
      SET premium = TRUE
      WHERE id = $1
-     RETURNING id, email, password_hash, display_name, premium, created_at`,
+     RETURNING id, email, password_hash, display_name, premium, premium_expires_at, created_at`,
     [request.user!.id],
   );
   response.json(toUserProfile(mapUserRow(result.rows[0])));

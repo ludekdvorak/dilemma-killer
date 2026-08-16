@@ -1,4 +1,4 @@
-export const GAME_IDS = ['wheel', 'dice', 'cards'] as const;
+export const GAME_IDS = ['wheel', 'dice', 'slots', 'cards'] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
 
@@ -11,17 +11,37 @@ export interface UserProfile {
   email: string;
   displayName: string;
   premium: boolean;
+  premiumExpiresAt: string | null;
 }
 
 export type AuthResponse = UserProfile;
 
 export interface PublicConfig {
   mockUpgradeEnabled: boolean;
+  goPayConfigured: boolean;
+  premiumPrice: {
+    amountMinor: number;
+    formatted: string;
+    currency: 'EUR';
+    interval: 'month';
+  };
+}
+
+export interface SubscriptionStatus {
+  active: boolean;
+  autoRenewing: boolean;
+  premiumExpiresAt: string | null;
 }
 
 export interface SavedPlayer {
   id: number;
   name: string;
+}
+
+export interface SavedGroup {
+  id: number;
+  name: string;
+  players: string[];
 }
 
 export interface GameSummary {
@@ -54,6 +74,11 @@ export interface CardResult {
   winner: Player;
   winnerIndex: number;
   card: string;
+}
+
+export interface SlotResult {
+  winner: Player;
+  winnerIndex: number;
 }
 
 export interface UserStatistics {

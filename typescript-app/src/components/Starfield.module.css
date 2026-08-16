@@ -1,0 +1,13 @@
+.space { position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:#05050d; }
+.nebula {
+  position:absolute;inset:-20%;
+  background:
+    radial-gradient(circle at 24% 38%,rgba(94,57,210,.22),transparent 25%),
+    radial-gradient(circle at 72% 65%,rgba(20,170,210,.13),transparent 24%),
+    radial-gradient(circle at 58% 18%,rgba(255,61,129,.08),transparent 18%);
+  animation:nebulaDrift 15s ease-in-out infinite alternate;
+}
+.canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.92}
+@keyframes nebulaDrift {
+  to { transform:translate3d(3vw,-2vh,0) scale(1.05); }
+}

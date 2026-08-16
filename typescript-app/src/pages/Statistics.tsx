@@ -6,6 +6,7 @@ import styles from './Statistics.module.css';
 const GAME_LABELS: Record<GameId, { label: string; icon: string }> = {
   wheel: { label: 'Lucky Wheel', icon: '🎡' },
   dice: { label: 'Dice Roll', icon: '🎲' },
+  slots: { label: 'Winner Slots', icon: '🎰' },
   cards: { label: 'Card Draw', icon: '🃏' },
 };
 
@@ -39,7 +40,7 @@ export default function Statistics({ onBack }: StatisticsProps) {
     <main className={styles.page}>
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={onBack}>← Back</button>
-        <div className={styles.logo}>⚔️ DILEMMA KILLER</div>
+        <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.title}>YOUR STATISTICS</h1>
         <p className={styles.subtitle}>Only games played while signed in are counted.</p>
       </header>

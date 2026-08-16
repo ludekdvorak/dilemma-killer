@@ -1,0 +1,30 @@
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.4rem 1.5rem 3rem;gap:1.7rem}
+.topBar{width:100%;max-width:780px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.6rem}
+.backBtn{align-self:flex-start;background:rgba(8,8,18,.75);border:1px solid var(--border);border-radius:11px;color:var(--text-muted);padding:.55rem 1rem}
+.backBtn:hover{color:var(--text);border-color:var(--accent)}
+.logo{font:700 .7rem var(--font-display);letter-spacing:.14em;color:#b79cff}
+.title{font:900 clamp(2.3rem,7vw,4.5rem)/1 var(--font-display);letter-spacing:-.04em}.title span{color:#ffcf48;text-shadow:0 0 28px rgba(255,207,72,.45)}
+.topBar p{color:var(--text-muted);font-size:.82rem}
+.machine{position:relative;width:min(680px,calc(100vw - 5.5rem));padding:1.15rem;border:3px solid #715626;border-radius:32px;background:linear-gradient(145deg,#5b3a13,#17101d 28%,#0b0913 72%,#3e260e);box-shadow:inset 0 0 0 4px #c99a3b,inset 0 0 45px rgba(255,188,63,.14),0 30px 70px rgba(0,0,0,.55),0 0 40px rgba(255,176,38,.12)}
+.marquee{display:flex;justify-content:center;align-items:center;gap:.9rem;padding:.75rem;color:#ffda68;font:800 clamp(.72rem,2vw,1rem) var(--font-display);letter-spacing:.12em;text-shadow:0 0 10px #ff9b28}.marquee span{animation:blink .8s alternate infinite}
+.reelWindow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;padding:.9rem;background:#050509;border:3px solid #291a0d;border-radius:20px;box-shadow:inset 0 0 30px #000}
+.reel{height:150px;position:relative;display:grid;place-items:center;overflow:hidden;border:2px solid #6e5231;border-radius:13px;background:linear-gradient(#dcecff,#fff 42%,#d7e6f6);box-shadow:inset 0 18px 25px rgba(25,21,48,.18),inset 0 -18px 25px rgba(25,21,48,.18)}
+.reel::before,.reel::after{content:'';position:absolute;left:0;right:0;height:28%;z-index:2}.reel::before{top:0;background:linear-gradient(rgba(24,16,45,.32),transparent)}.reel::after{bottom:0;background:linear-gradient(transparent,rgba(24,16,45,.32))}
+.reelGlow{position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(132,92,255,.36);box-shadow:0 0 16px #7048ff}
+.reelName{max-width:95%;padding:.3rem;color:#171023;font:900 clamp(.9rem,2.7vw,1.5rem)/1.1 var(--font-display);text-align:center;overflow-wrap:anywhere;animation:nameSnap .22s ease-out}
+.machineSpinning .reelName{filter:blur(.9px)}
+.machineSpinning .reel{box-shadow:inset 0 18px 25px rgba(25,21,48,.22),inset 0 -18px 25px rgba(25,21,48,.22),0 0 22px rgba(255,195,67,.24)}
+.machineFooter{display:flex;justify-content:space-between;align-items:center;padding:.85rem .5rem .1rem;color:#caa95d;font:700 .58rem var(--font-display);letter-spacing:.13em}
+.lights{display:flex;gap:.35rem}.lights i{width:7px;height:7px;border-radius:50%;background:#ffbd36;box-shadow:0 0 8px #ff8a1e;animation:blink .7s alternate infinite}.lights i:nth-child(even){animation-delay:-.35s}
+.lever{position:absolute;right:-42px;top:42%;width:40px;height:130px;background:none;border:0;transform-origin:50% 90%}
+.leverArm{position:absolute;width:10px;height:100px;left:15px;bottom:4px;border-radius:8px;background:linear-gradient(90deg,#4c391d,#e3b65f,#6b4d1d);transform-origin:bottom}
+.leverKnob{position:absolute;top:-7px;left:3px;width:34px;height:34px;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 28%,#ffda77,#e74b36 45%,#7b0e1d);box-shadow:0 5px 15px #000}
+.leverPulled{animation:leverPull .6s ease-in-out}.lever:disabled{cursor:wait}
+.winner{display:flex;flex-direction:column;align-items:center;gap:.2rem}.winner span{color:#ffcf48;font:800 .68rem var(--font-display);letter-spacing:.18em}.winner strong{font:900 clamp(2rem,7vw,3.8rem) var(--font-display);color:#fff;text-align:center;text-shadow:0 0 24px rgba(255,207,72,.55);overflow-wrap:anywhere}
+.error{color:var(--danger);font-size:.82rem}
+.spinBtn{border:1px solid #ffdd76;border-radius:13px;padding:1rem 2rem;background:linear-gradient(135deg,#ffd866,#d68a18);color:#251300;font:900 .82rem var(--font-display);letter-spacing:.08em;box-shadow:0 8px 30px rgba(255,180,45,.3)}
+.spinBtn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 13px 38px rgba(255,180,45,.46)}.spinBtn:disabled{opacity:.65;cursor:wait}
+@keyframes nameSnap{from{opacity:.2;transform:translateY(-35px) scaleY(.8)}}
+@keyframes blink{to{opacity:.35}}
+@keyframes leverPull{0%,100%{transform:rotate(0)}45%{transform:rotate(42deg)}}
+@media(max-width:560px){.page{padding:1rem;gap:1.25rem}.machine{width:calc(100vw - 4.5rem);padding:.7rem;border-radius:22px}.reelWindow{gap:.3rem;padding:.5rem}.reel{height:115px}.lever{right:-38px}.marquee{letter-spacing:.05em}.reelName{font-size:.72rem}.machineFooter{display:none}}

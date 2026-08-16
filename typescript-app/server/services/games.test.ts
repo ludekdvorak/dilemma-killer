@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Player } from '../../shared/contracts.js';
-import { drawCard, listGames, rollDice, spinWheel } from './games.js';
+import { drawCard, listGames, rollDice, spinSlots, spinWheel } from './games.js';
 
 const players: Player[] = [
   { id: '1', name: 'Alice' },
@@ -16,8 +16,8 @@ function sequence(values: number[]): () => number {
 describe('game catalog', () => {
   it('locks only Card Draw for a free user', () => {
     const games = listGames(false);
-    expect(games.map(({ id }) => id)).toEqual(['wheel', 'dice', 'cards']);
-    expect(games.map(({ locked }) => locked)).toEqual([false, false, true]);
+    expect(games.map(({ id }) => id)).toEqual(['wheel', 'dice', 'slots', 'cards']);
+    expect(games.map(({ locked }) => locked)).toEqual([false, false, false, true]);
   });
 
   it('unlocks all games for a premium user', () => {
@@ -46,6 +46,12 @@ describe('game results', () => {
     const result = drawCard(players, sequence([0.8, 0.99, 0.3]));
     expect(result.winner).toEqual(players[2]);
     expect(result.card).toBe('A♥');
+  });
+
+  it('selects the winner that all three slot reels will display', () => {
+    const result = spinSlots(players, () => 0.6);
+    expect(result.winnerIndex).toBe(1);
+    expect(result.winner).toEqual(players[1]);
   });
 
   it('rejects fewer than two players', () => {

@@ -5,8 +5,11 @@ import type {
   GameSummary,
   Player,
   PublicConfig,
+  SavedGroup,
   SavedPlayer,
+  SlotResult,
   SpinResult,
+  SubscriptionStatus,
   UserProfile,
   UserStatistics,
 } from '../shared/contracts';
@@ -24,7 +27,7 @@ export class ApiRequestError extends Error {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   signal?: AbortSignal;
   timeoutMs?: number;
@@ -88,12 +91,33 @@ export const login = (email: string, password: string, signal?: AbortSignal) =>
 export const logout = () => request<void>('/auth/logout', { method: 'POST' });
 export const me = (signal?: AbortSignal) => request<UserProfile>('/auth/me', { signal });
 export const upgradeToPremium = () => request<UserProfile>('/auth/upgrade', { method: 'POST' });
+export const updateProfile = (
+  email: string,
+  displayName: string,
+  currentPassword?: string,
+) => request<UserProfile>('/auth/profile', {
+  method: 'PATCH',
+  body: { email, displayName, currentPassword },
+});
+export const changePassword = (currentPassword: string, newPassword: string) =>
+  request<void>('/auth/password', {
+    method: 'POST',
+    body: { currentPassword, newPassword },
+  });
 
 export const getSavedPlayers = (signal?: AbortSignal) => request<SavedPlayer[]>('/players', { signal });
 export const addSavedPlayer = (name: string) =>
   request<SavedPlayer>('/players', { method: 'POST', body: { name } });
 export const deleteSavedPlayer = (id: number) =>
   request<void>(`/players/${id}`, { method: 'DELETE' });
+
+export const getGroups = (signal?: AbortSignal) => request<SavedGroup[]>('/groups', { signal });
+export const createGroup = (name: string, players: string[]) =>
+  request<SavedGroup>('/groups', { method: 'POST', body: { name, players } });
+export const updateGroup = (id: number, name: string, players: string[]) =>
+  request<SavedGroup>(`/groups/${id}`, { method: 'PUT', body: { name, players } });
+export const deleteGroup = (id: number) =>
+  request<void>(`/groups/${id}`, { method: 'DELETE' });
 
 export const getGames = (signal?: AbortSignal) => request<GameSummary[]>('/games', { signal });
 export const spinWheel = (players: Player[], signal?: AbortSignal) =>
@@ -102,6 +126,16 @@ export const rollDice = (players: Player[], signal?: AbortSignal) =>
   request<DiceResult>('/games/dice/roll', { method: 'POST', body: players, signal });
 export const drawCard = (players: Player[], signal?: AbortSignal) =>
   request<CardResult>('/games/cards/draw', { method: 'POST', body: players, signal });
+export const spinSlots = (players: Player[], signal?: AbortSignal) =>
+  request<SlotResult>('/games/slots/spin', { method: 'POST', body: players, signal });
 
 export const getStatistics = (signal?: AbortSignal) => request<UserStatistics>('/statistics', { signal });
 export const getPublicConfig = (signal?: AbortSignal) => request<PublicConfig>('/config', { signal });
+export const createGoPayCheckout = () =>
+  request<{ checkoutUrl: string; orderNumber: string }>('/payments/gopay', { method: 'POST' });
+export const getPaymentStatus = (orderNumber: string, signal?: AbortSignal) =>
+  request<{ state: string }>(`/payments/order/${encodeURIComponent(orderNumber)}/status`, { signal });
+export const getSubscriptionStatus = (signal?: AbortSignal) =>
+  request<SubscriptionStatus>('/payments/subscription/status', { signal });
+export const cancelSubscription = () =>
+  request<void>('/payments/subscription/cancel', { method: 'POST' });

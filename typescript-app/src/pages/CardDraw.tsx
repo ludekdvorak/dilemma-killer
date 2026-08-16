@@ -59,7 +59,7 @@ export default function CardDraw({ players, onBack }: CardDrawProps) {
     <main className={styles.page}>
       <header className={styles.topBar}>
         <button className={styles.backBtn} onClick={onBack}>← Back</button>
-        <div className={styles.logo}>⚔️ DILEMMA KILLER</div>
+        <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.gameTitle}>CARD DRAW</h1>
       </header>
 
@@ -84,7 +84,7 @@ export default function CardDraw({ players, onBack }: CardDrawProps) {
       )}
       {error && <div className={styles.errorNote} role="alert">{error}</div>}
       <button className={styles.drawBtn} onClick={() => void handleDraw()} disabled={drawing}>
-        {drawing ? 'DRAWING…' : result ? 'DRAW AGAIN' : 'DRAW A CARD'}
+        {drawing ? 'PICKING YOUR FATE…' : result ? 'RUN IT BACK ↻' : 'DRAW YOUR FATE →'}
       </button>
     </main>
   );

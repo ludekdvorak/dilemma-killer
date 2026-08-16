@@ -5,9 +5,9 @@ import { prefersReducedMotion } from '../motion';
 import styles from './LuckyWheel.module.css';
 
 const SEGMENT_COLORS = [
-  '#ff6b35', '#ffd166', '#06d6a0', '#118ab2',
-  '#e040fb', '#ff4081', '#69f0ae', '#ffab40',
-  '#40c4ff', '#ff6d00', '#b2ff59', '#ea80fc',
+  '#8b5cf6', '#22d3ee', '#ff3d81', '#c4ff4d',
+  '#a855f7', '#38bdf8', '#fb7185', '#facc15',
+  '#6366f1', '#06b6d4', '#ec4899', '#84cc16',
 ];
 
 interface LuckyWheelProps {
@@ -26,7 +26,7 @@ function drawWheel(canvas: HTMLCanvasElement, players: Player[], rotationAngle: 
   context.clearRect(0, 0, size, size);
 
   context.save();
-  context.shadowColor = 'rgba(255,107,53,0.3)';
+  context.shadowColor = 'rgba(139,92,246,0.4)';
   context.shadowBlur = 40;
   context.beginPath();
   context.arc(center, center, radius, 0, 2 * Math.PI);
@@ -68,7 +68,7 @@ function drawWheel(canvas: HTMLCanvasElement, players: Player[], rotationAngle: 
   context.stroke();
   context.beginPath();
   context.arc(center, center, 8, 0, 2 * Math.PI);
-  context.fillStyle = '#ff6b35';
+  context.fillStyle = '#8b5cf6';
   context.fill();
 }
 
@@ -159,7 +159,7 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
     <main className={styles.page}>
       <header className={styles.topBar}>
         <button className={styles.backBtn} onClick={onBack}>← Back</button>
-        <div className={styles.logo}>⚔️ DILEMMA KILLER</div>
+        <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.gameTitle}>LUCKY WHEEL</h1>
         <div className={styles.playerPills}>
           {players.slice(0, 5).map((player, index) => (
@@ -193,7 +193,7 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
 
       {winner && !spinning && (
         <div className={styles.winnerBanner} role="status" aria-live="polite">
-          <div className={styles.winnerLabel}>WINNER</div>
+          <div className={styles.winnerLabel}>THE WHEEL HAS SPOKEN</div>
           <div className={styles.winnerName}>{winner.name}</div>
           <div className={styles.confetti}>🎉</div>
         </div>
@@ -204,7 +204,7 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
         onClick={() => void handleSpin()}
         disabled={spinning}
       >
-        {spinning ? 'SPINNING…' : winner ? 'SPIN AGAIN' : 'SPIN!'}
+        {spinning ? 'FATE IS DECIDING…' : winner ? 'RUN IT BACK ↻' : 'SPIN THE WHEEL →'}
       </button>
     </main>
   );

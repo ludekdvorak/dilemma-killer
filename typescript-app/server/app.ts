@@ -10,6 +10,8 @@ import { pool } from './db/pool.js';
 import { errorHandler, notFound } from './errors.js';
 import { authRouter } from './routes/auth.js';
 import { gamesRouter, wheelRouter } from './routes/games.js';
+import { groupsRouter } from './routes/groups.js';
+import { paymentsRouter } from './routes/payments.js';
 import { playersRouter } from './routes/players.js';
 import { statisticsRouter } from './routes/statistics.js';
 
@@ -52,7 +54,16 @@ export function createApp() {
   });
 
   app.get('/api/config', (_request, response) => {
-    response.json({ mockUpgradeEnabled: config.allowMockUpgrade });
+    response.json({
+      mockUpgradeEnabled: config.allowMockUpgrade,
+      goPayConfigured: config.goPay.configured,
+      premiumPrice: {
+        amountMinor: config.goPay.premiumAmountMinor,
+        formatted: '€2',
+        currency: config.goPay.premiumCurrency,
+        interval: 'month',
+      },
+    });
   });
 
   app.get('/api/ready', async (_request, response) => {
@@ -64,9 +75,11 @@ export function createApp() {
 
   app.use('/api/auth', authRouter);
   app.use('/api/players', playersRouter);
+  app.use('/api/groups', groupsRouter);
   app.use('/api/games', gamesRouter);
   app.use('/api/wheel', wheelRouter);
   app.use('/api/statistics', statisticsRouter);
+  app.use('/api/payments', paymentsRouter);
   app.use('/api', notFound);
 
   if (existsSync(clientDirectory)) {

@@ -9,6 +9,7 @@ export interface CurrentUser {
   email: string;
   displayName: string;
   premium: boolean;
+  premiumExpiresAt: Date | null;
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ interface UserRow {
   email: string;
   display_name: string;
   premium: boolean;
+  premium_expires_at: Date | null;
   created_at: Date;
 }
 
@@ -35,6 +37,7 @@ export function toUserProfile(user: CurrentUser): UserProfile {
     email: user.email,
     displayName: user.displayName,
     premium: user.premium,
+    premiumExpiresAt: user.premiumExpiresAt?.toISOString() ?? null,
   };
 }
 
@@ -43,7 +46,8 @@ export function mapUserRow(row: UserRow): CurrentUser {
     id: row.id,
     email: row.email,
     displayName: row.display_name,
-    premium: row.premium,
+    premium: row.premium && (!row.premium_expires_at || row.premium_expires_at > new Date()),
+    premiumExpiresAt: row.premium_expires_at,
     createdAt: row.created_at,
   };
 }
@@ -70,7 +74,7 @@ async function authenticateToken(token: string): Promise<CurrentUser | undefined
   if (!Number.isSafeInteger(userId) || userId < 1) return undefined;
 
   const result = await pool.query<UserRow>(
-    `SELECT id, email, display_name, premium, created_at
+    `SELECT id, email, display_name, premium, premium_expires_at, created_at
      FROM users
      WHERE id = $1`,
     [userId],
