@@ -42,6 +42,7 @@ describe('PostgreSQL-backed API', () => {
       displayName: 'First User',
       premium: false,
       premiumExpiresAt: null,
+      hasPassword: true,
     });
 
     await request(app)
@@ -101,7 +102,9 @@ describe('PostgreSQL-backed API', () => {
   });
 
   it('records successful authenticated games and aggregates statistics', async () => {
-    await firstUser.post('/api/games/cards/draw').send(players).expect(403);
+    await firstUser.post('/api/games/roulette/spin').send(players).expect(403);
+    await firstUser.post('/api/games/horserace/race').send(players).expect(403);
+    await firstUser.post('/api/games/bomb/start').send(players).expect(403);
     await firstUser.post('/api/games/dice/roll').send(players).expect(200);
     await firstUser.post('/api/games/slots/spin').send(players).expect(200);
     await firstUser.post('/api/auth/upgrade').expect(200);
@@ -112,11 +115,14 @@ describe('PostgreSQL-backed API', () => {
       premiumExpiresAt: null,
     });
     await firstUser.post('/api/games/cards/draw').send(players).expect(200);
+    await firstUser.post('/api/games/roulette/spin').send(players).expect(200);
+    await firstUser.post('/api/games/horserace/race').send(players).expect(200);
+    await firstUser.post('/api/games/bomb/start').send(players).expect(200);
 
     const statistics = await firstUser.get('/api/statistics').expect(200);
-    expect(statistics.body.totalPlays).toBe(3);
-    expect(statistics.body.byGame).toEqual({ wheel: 0, dice: 1, slots: 1, cards: 1 });
-    expect(['dice', 'slots', 'cards']).toContain(statistics.body.favoriteGame);
+    expect(statistics.body.totalPlays).toBe(6);
+    expect(statistics.body.byGame).toEqual({ wheel: 0, dice: 1, slots: 1, cards: 1, roulette: 1, horserace: 1, bomb: 1 });
+    expect(['dice', 'slots', 'cards', 'roulette', 'horserace', 'bomb']).toContain(statistics.body.favoriteGame);
 
     const secondStatistics = await secondUser.get('/api/statistics').expect(200);
     expect(secondStatistics.body.totalPlays).toBe(0);

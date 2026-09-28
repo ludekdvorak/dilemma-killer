@@ -83,7 +83,7 @@ export default function Upgrade({ onDone, onGoToAuth }: UpgradeProps) {
       <header className={styles.header}>
         <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.title}>PREMIUM</h1>
-        <p>Unlock every game for <strong>€2 per month</strong>.</p>
+        <p>Unlock Ticking Bomb, Horse Racing, and Roulette for <strong>€2 per month</strong>.</p>
       </header>
 
       <div className={styles.form}>
@@ -124,7 +124,7 @@ export default function Upgrade({ onDone, onGoToAuth }: UpgradeProps) {
                 </button>
                 {!publicConfig.goPayConfigured && (
                   <p className={styles.centeredNote}>
-                    GoPay Sandbox is prepared but not connected. Add your merchant GoID, Client ID,
+                    GoPay is not connected. Add your merchant GoID, Client ID,
                     Client Secret, and public app URL to enable checkout.
                   </p>
                 )}

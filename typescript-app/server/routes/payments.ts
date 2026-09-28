@@ -113,7 +113,7 @@ export const paymentsRouter = Router();
 
 paymentsRouter.post('/gopay', requireAuth, async (request, response) => {
   if (!config.goPay.configured) {
-    throw new HttpError(503, 'GoPay is not connected yet. Add your sandbox merchant credentials first.');
+    throw new HttpError(503, 'GoPay is not connected yet. Add your merchant credentials first.');
   }
   const orderNumber = `DK-${randomUUID()}`;
   await pool.query(

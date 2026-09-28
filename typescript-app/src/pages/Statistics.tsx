@@ -8,6 +8,9 @@ const GAME_LABELS: Record<GameId, { label: string; icon: string }> = {
   dice: { label: 'Dice Roll', icon: '🎲' },
   slots: { label: 'Winner Slots', icon: '🎰' },
   cards: { label: 'Card Draw', icon: '🃏' },
+  roulette: { label: 'Roulette', icon: '🔴' },
+  horserace: { label: 'Horse Racing', icon: '🏇' },
+  bomb: { label: 'Ticking Bomb', icon: '💣' },
 };
 
 interface StatisticsProps {

@@ -1,3 +1,4 @@
+import GameAccount from '../components/GameAccount';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { Player, SpinResult } from '../../shared/contracts';
 import { ApiRequestError, spinWheel } from '../api';
@@ -12,6 +13,7 @@ const SEGMENT_COLORS = [
 interface LuckyWheelProps {
   players: Player[];
   onBack: () => void;
+  onGoToAuth: () => void;
 }
 
 type WinnerStyle = CSSProperties & {
@@ -57,7 +59,7 @@ function drawWheel(canvas: HTMLCanvasElement, players: Player[], rotationAngle: 
     context.rotate(startAngle + arc / 2);
     context.textAlign = 'right';
     context.fillStyle = 'rgba(0,0,0,0.85)';
-    context.font = `bold ${Math.min(16, Math.floor(radius * 0.15))}px 'DM Sans', sans-serif`;
+    context.font = `bold ${Math.min(16, Math.floor(radius * 0.15))}px Inter, sans-serif`;
     const label = player.name.length > 10 ? `${player.name.slice(0, 9)}…` : player.name;
     context.fillText(label, radius - 14, 5);
     context.restore();
@@ -88,7 +90,7 @@ function localSpin(players: Player[]): SpinResult {
   };
 }
 
-export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
+export default function LuckyWheel({ players, onBack, onGoToAuth }: LuckyWheelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const requestControllerRef = useRef<AbortController | null>(null);
@@ -164,7 +166,10 @@ export default function LuckyWheel({ players, onBack }: LuckyWheelProps) {
   return (
     <main className={styles.page}>
       <header className={styles.topBar}>
-        <button className={styles.backBtn} onClick={onBack}>← Back</button>
+        <div className="game-navigation">
+          <button className={styles.backBtn} onClick={onBack}>← Back</button>
+          <GameAccount onGoToAuth={onGoToAuth} />
+        </div>
         <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.gameTitle}>LUCKY WHEEL</h1>
         <div className={styles.playerPills}>

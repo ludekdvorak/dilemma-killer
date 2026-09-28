@@ -6,43 +6,14 @@ import type {
   Player,
   SlotResult,
   SpinResult,
+  RaceResult,
+  BombResult,
+  RouletteResult,
 } from '../../shared/contracts.js';
 
+import { GAME_DEFINITIONS } from '../../shared/games.js';
+
 type RandomSource = () => number;
-
-const SUITS = ['♠', '♥', '♦', '♣'] as const;
-const RANKS = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'] as const;
-
-const GAME_DEFINITIONS: ReadonlyArray<Omit<GameSummary, 'locked'>> = [
-  {
-    id: 'wheel',
-    name: 'Lucky Wheel',
-    description: 'Spin the wheel and randomly select one player',
-    icon: '🎡',
-    premium: false,
-  },
-  {
-    id: 'dice',
-    name: 'Dice Roll',
-    description: 'Everyone rolls; the highest number wins',
-    icon: '🎲',
-    premium: false,
-  },
-  {
-    id: 'slots',
-    name: 'Winner Slots',
-    description: 'Pull the lever and line up a guaranteed winner',
-    icon: '🎰',
-    premium: false,
-  },
-  {
-    id: 'cards',
-    name: 'Card Draw',
-    description: 'Draw a card and discover your fate',
-    icon: '🃏',
-    premium: true,
-  },
-];
 
 function randomIndex(length: number, random: RandomSource): number {
   return Math.min(length - 1, Math.floor(random() * length));
@@ -105,18 +76,33 @@ export function rollDice(players: Player[], random: RandomSource = Math.random):
 export function drawCard(players: Player[], random: RandomSource = Math.random): CardResult {
   requirePlayers(players);
   const winnerIndex = randomIndex(players.length, random);
-  const rank = RANKS[randomIndex(RANKS.length, random)];
-  const suit = SUITS[randomIndex(SUITS.length, random)];
-
-  return {
-    winner: players[winnerIndex],
-    winnerIndex,
-    card: `${rank}${suit}`,
-  };
+  return { winner: players[winnerIndex], winnerIndex };
 }
 
 export function spinSlots(players: Player[], random: RandomSource = Math.random): SlotResult {
   requirePlayers(players);
   const winnerIndex = randomIndex(players.length, random);
   return { winner: players[winnerIndex], winnerIndex };
+}
+
+export function spinRoulette(players: Player[], random: RandomSource = Math.random): RouletteResult {
+  requirePlayers(players);
+  const winnerIndex = randomIndex(players.length, random);
+  return { winner: players[winnerIndex], winnerIndex };
+}
+
+export function raceHorses(players: Player[], random: RandomSource = Math.random): RaceResult {
+  requirePlayers(players);
+  const finishOrder = players.map((_, index) => index);
+  for (let index = finishOrder.length - 1; index > 0; index--) {
+    const swap = randomIndex(index + 1, random);
+    [finishOrder[index], finishOrder[swap]] = [finishOrder[swap], finishOrder[index]];
+  }
+  const winnerIndex = finishOrder[0];
+  return { winner: players[winnerIndex], winnerIndex, finishOrder };
+}
+
+export function startBomb(players: Player[], random: RandomSource = Math.random): BombResult {
+  requirePlayers(players);
+  return { startingIndex: randomIndex(players.length, random), fuseMs: 8_000 + randomIndex(5_001, random) };
 }

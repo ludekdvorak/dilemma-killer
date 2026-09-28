@@ -8,8 +8,6 @@ interface Star {
   previousZ: number;
 }
 
-const STAR_COUNT = 150;
-
 export default function Starfield() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -24,6 +22,7 @@ export default function Starfield() {
     let depth = Math.max(width, height);
     let animationFrame = 0;
     let previousTime = performance.now();
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     const stars: Star[] = [];
 
     const resetStar = (star: Star, randomDepth = false) => {
@@ -37,7 +36,7 @@ export default function Starfield() {
       width = window.innerWidth;
       height = window.innerHeight;
       depth = Math.max(width, height);
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
       canvas.style.width = `${width}px`;
@@ -46,7 +45,7 @@ export default function Starfield() {
       stars.forEach((star) => resetStar(star, true));
     };
 
-    for (let index = 0; index < STAR_COUNT; index += 1) {
+    for (let index = 0; index < (width < 600 ? 60 : 110); index += 1) {
       const star = { x: 0, y: 0, z: 1, previousZ: 1 };
       resetStar(star, true);
       stars.push(star);
@@ -54,14 +53,20 @@ export default function Starfield() {
     resize();
 
     const draw = (now: number) => {
+      if (document.hidden) return;
+      const reducedMotion = motionPreference.matches;
+      if (!reducedMotion && now - previousTime < 32) {
+        animationFrame = window.requestAnimationFrame(draw);
+        return;
+      }
       const frameScale = Math.min((now - previousTime) / 16.67, 2.5);
       previousTime = now;
       context.clearRect(0, 0, width, height);
       context.lineCap = 'round';
 
       for (const star of stars) {
-        star.previousZ = star.z;
-        star.z -= 4.6 * frameScale;
+        star.previousZ = star.z + (reducedMotion ? 2 : 0);
+        if (!reducedMotion) star.z -= 4.6 * frameScale;
         if (star.z <= 1) resetStar(star);
 
         const x = (star.x / star.z) * depth + width / 2;
@@ -84,14 +89,24 @@ export default function Starfield() {
         context.stroke();
       }
 
-      animationFrame = window.requestAnimationFrame(draw);
+      if (!reducedMotion) animationFrame = window.requestAnimationFrame(draw);
     };
 
-    animationFrame = window.requestAnimationFrame(draw);
-    window.addEventListener('resize', resize);
+    const restart = () => {
+      window.cancelAnimationFrame(animationFrame);
+      previousTime = performance.now() - 33;
+      if (!document.hidden) animationFrame = window.requestAnimationFrame(draw);
+    };
+    const onResize = () => { resize(); restart(); };
+    restart();
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', restart);
+    motionPreference.addEventListener('change', restart);
     return () => {
       window.cancelAnimationFrame(animationFrame);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', restart);
+      motionPreference.removeEventListener('change', restart);
     };
   }, []);
 

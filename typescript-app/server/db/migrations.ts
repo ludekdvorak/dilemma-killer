@@ -112,6 +112,25 @@ const migrations: Migration[] = [
         ON payment_orders(user_id, created_at DESC);
     `,
   },
+  {
+    version: 3,
+    name: 'google_accounts',
+    sql: `
+      ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+      ALTER TABLE users ADD COLUMN google_subject VARCHAR(255) UNIQUE;
+      ALTER TABLE users ADD CONSTRAINT users_have_sign_in_method
+        CHECK (password_hash IS NOT NULL OR google_subject IS NOT NULL);
+    `,
+  },
+  {
+    version: 4,
+    name: 'new_premium_games',
+    sql: `
+      ALTER TABLE game_plays DROP CONSTRAINT game_plays_known_game;
+      ALTER TABLE game_plays ADD CONSTRAINT game_plays_known_game
+        CHECK (game_id IN ('wheel', 'dice', 'slots', 'cards', 'roulette', 'horserace', 'bomb'));
+    `,
+  },
 ];
 
 const migrationLockId = 1_947_260_314;

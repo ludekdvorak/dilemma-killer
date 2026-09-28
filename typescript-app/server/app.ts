@@ -34,14 +34,17 @@ export function createApp({
   if (config.trustProxyHops > 0) app.set('trust proxy', config.trustProxyHops);
 
   app.use(helmet({
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    referrerPolicy: { policy: config.isProduction ? 'strict-origin-when-cross-origin' : 'no-referrer-when-downgrade' },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        scriptSrc: ["'self'", 'https://accounts.google.com/gsi/client'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://accounts.google.com/gsi/style'],
+        fontSrc: ["'self'"],
         imgSrc: ["'self'", 'data:'],
-        connectSrc: ["'self'"],
+        connectSrc: ["'self'", 'https://accounts.google.com/gsi/'],
+        frameSrc: ["'self'", 'https://accounts.google.com/gsi/'],
         upgradeInsecureRequests: config.isProduction ? [] : null,
       },
     },
@@ -49,6 +52,10 @@ export function createApp({
 
   app.use(express.json({ limit: '32kb' }));
   app.use(cookieParser());
+  app.use('/api/auth', (_request, response, next) => {
+    response.setHeader('Cache-Control', 'no-store');
+    next();
+  });
 
   app.get('/api/health', (_request, response) => {
     response.json({ status: 'ok' });

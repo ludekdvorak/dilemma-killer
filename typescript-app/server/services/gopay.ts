@@ -26,7 +26,7 @@ function requireConfig() {
     || !config.goPay.clientSecret
     || !config.appBaseUrl
   ) {
-    throw new HttpError(503, 'GoPay is not connected yet. Add your sandbox merchant credentials first.');
+    throw new HttpError(503, 'GoPay is not connected yet. Add your merchant credentials first.');
   }
   return {
     goId: config.goPay.goId,

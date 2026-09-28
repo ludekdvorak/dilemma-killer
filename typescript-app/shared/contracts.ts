@@ -1,4 +1,4 @@
-export const GAME_IDS = ['wheel', 'dice', 'slots', 'cards'] as const;
+export const GAME_IDS = ['wheel', 'dice', 'slots', 'cards', 'roulette', 'horserace', 'bomb'] as const;
 
 export type GameId = (typeof GAME_IDS)[number];
 
@@ -12,6 +12,12 @@ export interface UserProfile {
   displayName: string;
   premium: boolean;
   premiumExpiresAt: string | null;
+  hasPassword: boolean;
+}
+
+export interface GoogleSignInConfig {
+  clientId: string | null;
+  nonce?: string;
 }
 
 export type AuthResponse = UserProfile;
@@ -73,12 +79,27 @@ export interface DiceResult {
 export interface CardResult {
   winner: Player;
   winnerIndex: number;
-  card: string;
+}
+
+export interface RouletteResult {
+  winner: Player;
+  winnerIndex: number;
 }
 
 export interface SlotResult {
   winner: Player;
   winnerIndex: number;
+}
+
+export interface RaceResult {
+  winner: Player;
+  winnerIndex: number;
+  finishOrder: number[];
+}
+
+export interface BombResult {
+  startingIndex: number;
+  fuseMs: number;
 }
 
 export interface UserStatistics {

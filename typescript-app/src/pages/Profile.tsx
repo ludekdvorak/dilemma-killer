@@ -120,7 +120,8 @@ export default function Profile({ onBack, onUpgrade }: ProfileProps) {
             <div><h2>PERSONAL DETAILS</h2><p>How other players see you.</p></div>
           </div>
           <label>Display name<input value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={30} required /></label>
-          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
+          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} disabled={!user.hasPassword} required /></label>
+          {!user.hasPassword && <p className={styles.muted}>Your email is managed by Google.</p>}
           {email !== user.email && (
             <label>Current password<input type="password" value={profilePassword} onChange={(event) => setProfilePassword(event.target.value)} autoComplete="current-password" required /></label>
           )}
@@ -131,13 +132,19 @@ export default function Profile({ onBack, onUpgrade }: ProfileProps) {
         <form className={styles.card} onSubmit={(event) => void submitPassword(event)}>
           <div className={styles.cardHeading}>
             <span>02</span>
-            <div><h2>SECURITY</h2><p>Choose a fresh password.</p></div>
+            <div><h2>SECURITY</h2><p>{user.hasPassword ? 'Choose a fresh password.' : 'Connected with Google.'}</p></div>
           </div>
-          <label>Current password<input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required /></label>
-          <label>New password<input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength={8} required /></label>
-          <label>Confirm new password<input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={8} required /></label>
-          {passwordMessage && <p className={passwordMessage === 'Password changed' ? styles.success : styles.error}>{passwordMessage}</p>}
-          <button className={styles.primaryBtn} disabled={busy}>CHANGE PASSWORD</button>
+          {user.hasPassword ? (
+            <>
+              <label>Current password<input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required /></label>
+              <label>New password<input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength={8} required /></label>
+              <label>Confirm new password<input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={8} required /></label>
+              {passwordMessage && <p className={passwordMessage === 'Password changed' ? styles.success : styles.error}>{passwordMessage}</p>}
+              <button className={styles.primaryBtn} disabled={busy}>CHANGE PASSWORD</button>
+            </>
+          ) : (
+            <p className={styles.muted}>You sign in with Google. Manage your password and security in your Google account.</p>
+          )}
         </form>
 
         <article className={`${styles.card} ${styles.premiumCard}`}>
