@@ -8,11 +8,17 @@ import { config } from '../config.js';
 import { pool } from '../db/pool.js';
 import { HttpError } from '../errors.js';
 import { emailSchema, passwordSchema } from '../validation.js';
+import {
+  createGoogleChallenge,
+  googleChallengeCookie,
+  googleChallengeOptions,
+  verifyGoogleCredential,
+} from '../services/google.js';
 
 interface UserWithPasswordRow {
   id: number;
   email: string;
-  password_hash: string;
+  password_hash: string | null;
   display_name: string;
   premium: boolean;
   premium_expires_at: Date | null;
@@ -82,6 +88,52 @@ async function setSessionCookie(response: Response, user: CurrentUser): Promise<
 
 export const authRouter = Router();
 
+authRouter.get('/google/config', authLimiter, async (_request, response) => {
+  if (!config.googleClientId) {
+    response.json({ clientId: null });
+    return;
+  }
+  const { nonce, challenge } = await createGoogleChallenge();
+  response.cookie(googleChallengeCookie, challenge, {
+    ...googleChallengeOptions,
+    maxAge: 10 * 60 * 1_000,
+  });
+  response.json({ clientId: config.googleClientId, nonce });
+});
+
+authRouter.post('/google', authLimiter, async (request, response) => {
+  const { credential } = z.object({ credential: z.string().min(1).max(16_000) }).parse(request.body);
+  const identity = await verifyGoogleCredential(credential, request.cookies?.[googleChallengeCookie]);
+  const existing = await pool.query<UserWithPasswordRow>(
+    `SELECT id, email, password_hash, display_name, premium, premium_expires_at, created_at
+     FROM users WHERE google_subject = $1`,
+    [identity.subject],
+  );
+  let row = existing.rows[0];
+  if (!row) {
+    try {
+      const created = await pool.query<UserWithPasswordRow>(
+        `INSERT INTO users (email, display_name, google_subject)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (google_subject) DO UPDATE SET google_subject = EXCLUDED.google_subject
+         RETURNING id, email, password_hash, display_name, premium, premium_expires_at, created_at`,
+        [identity.email, identity.displayName, identity.subject],
+      );
+      row = created.rows[0];
+    } catch (error) {
+      // An email match alone is not enough to link an existing password account.
+      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+        throw new HttpError(409, 'An account already uses this email. Sign in with your password.');
+      }
+      throw error;
+    }
+  }
+  const user = mapUserRow(row);
+  await setSessionCookie(response, user);
+  response.clearCookie(googleChallengeCookie, googleChallengeOptions);
+  response.json(toUserProfile(user));
+});
+
 authRouter.post('/register', authLimiter, async (request, response) => {
   const input = registerSchema.parse(request.body);
   const passwordHash = await hash(input.password, 12);
@@ -105,7 +157,7 @@ authRouter.post('/login', authLimiter, async (request, response) => {
     [input.email],
   );
   const row = result.rows[0];
-  if (!row || !(await compare(input.password, row.password_hash))) {
+  if (!row?.password_hash || !(await compare(input.password, row.password_hash))) {
     throw new HttpError(401, 'Invalid credentials');
   }
   const user = mapUserRow(row);
@@ -137,6 +189,9 @@ authRouter.patch('/profile', requireAuth, async (request, response) => {
   );
   const row = current.rows[0];
   if (input.email !== row.email) {
+    if (!row.password_hash) {
+      throw new HttpError(400, 'Your email is managed by your Google account');
+    }
     if (!input.currentPassword || !(await compare(input.currentPassword, row.password_hash))) {
       throw new HttpError(401, 'Current password is required to change your email');
     }
@@ -158,6 +213,9 @@ authRouter.post('/password', authLimiter, requireAuth, async (request, response)
     'SELECT password_hash FROM users WHERE id = $1',
     [request.user!.id],
   );
+  if (!current.rows[0].password_hash) {
+    throw new HttpError(400, 'Use Google to sign in to this account');
+  }
   if (!(await compare(input.currentPassword, current.rows[0].password_hash))) {
     throw new HttpError(401, 'Current password is incorrect');
   }

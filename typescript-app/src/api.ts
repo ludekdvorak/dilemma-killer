@@ -3,12 +3,16 @@ import type {
   CardResult,
   DiceResult,
   GameSummary,
+  GoogleSignInConfig,
   Player,
   PublicConfig,
   SavedGroup,
   SavedPlayer,
   SlotResult,
   SpinResult,
+  RaceResult,
+  BombResult,
+  RouletteResult,
   SubscriptionStatus,
   UserProfile,
   UserStatistics,
@@ -89,6 +93,10 @@ export const login = (email: string, password: string, signal?: AbortSignal) =>
   request<AuthResponse>('/auth/login', { method: 'POST', body: { email, password }, signal });
 
 export const logout = () => request<void>('/auth/logout', { method: 'POST' });
+export const getGoogleSignInConfig = (signal?: AbortSignal) =>
+  request<GoogleSignInConfig>('/auth/google/config', { signal });
+export const loginWithGoogle = (credential: string, signal?: AbortSignal) =>
+  request<AuthResponse>('/auth/google', { method: 'POST', body: { credential }, signal });
 export const me = (signal?: AbortSignal) => request<UserProfile>('/auth/me', { signal });
 export const upgradeToPremium = () => request<UserProfile>('/auth/upgrade', { method: 'POST' });
 export const updateProfile = (
@@ -128,6 +136,12 @@ export const drawCard = (players: Player[], signal?: AbortSignal) =>
   request<CardResult>('/games/cards/draw', { method: 'POST', body: players, signal });
 export const spinSlots = (players: Player[], signal?: AbortSignal) =>
   request<SlotResult>('/games/slots/spin', { method: 'POST', body: players, signal });
+export const spinRoulette = (players: Player[], signal?: AbortSignal) =>
+  request<RouletteResult>('/games/roulette/spin', { method: 'POST', body: players, signal });
+export const raceHorses = (players: Player[], signal?: AbortSignal) =>
+  request<RaceResult>('/games/horserace/race', { method: 'POST', body: players, signal });
+export const startBomb = (players: Player[], signal?: AbortSignal) =>
+  request<BombResult>('/games/bomb/start', { method: 'POST', body: players, signal });
 
 export const getStatistics = (signal?: AbortSignal) => request<UserStatistics>('/statistics', { signal });
 export const getPublicConfig = (signal?: AbortSignal) => request<PublicConfig>('/config', { signal });

@@ -10,7 +10,7 @@
 .heroDie>div{position:relative;z-index:2}
 .dieOrbit{position:absolute;z-index:1;left:50%;bottom:9px;width:105px;height:25px;translate:-50% 0;border:1px solid rgba(34,211,238,.32);border-radius:50%;background:radial-gradient(ellipse,rgba(34,211,238,.22),transparent 68%);box-shadow:0 0 24px rgba(34,211,238,.22);animation:orbitPulse 2.1s ease-in-out infinite alternate}
 @keyframes orbitPulse{to{transform:scaleX(.72);opacity:.48}}
-@media(prefers-reduced-motion:reduce){.dieOrbit{animation-duration:2.1s!important;animation-iteration-count:infinite!important}}
+@media(prefers-reduced-motion:reduce){.dieOrbit{animation:none}}
 .eyebrow,.sectionLabel { font-family:var(--font-display); font-size:.62rem; letter-spacing:.24em; color:#716d88; font-weight:700; }
 .title { font-family:var(--font-display); font-size:clamp(3.2rem,9vw,6.5rem); line-height:.83; letter-spacing:-.055em; display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
 .title span { color:#f8f7fb; text-shadow:0 2px 0 #817d8c; }

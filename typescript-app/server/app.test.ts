@@ -17,7 +17,9 @@ afterAll(async () => {
 
 describe('public API', () => {
   it('exposes health and non-secret public configuration', async () => {
-    await request(app).get('/api/health').expect(200, { status: 'ok' });
+    const health = await request(app).get('/api/health').expect(200, { status: 'ok' });
+    expect(health.headers['cross-origin-opener-policy']).toBe('same-origin-allow-popups');
+    expect(health.headers['referrer-policy']).toBe('no-referrer-when-downgrade');
     await request(app).get('/api/config').expect(200, {
       mockUpgradeEnabled: true,
       goPayConfigured: false,
@@ -31,20 +33,22 @@ describe('public API', () => {
     await request(app).get('/api/wheel/health').expect(200, 'Dilemma Killer API is running!');
   });
 
-  it('shows free games and locks Card Draw for anonymous users', async () => {
+  it('shows the free games and locks only the three premium games for anonymous users', async () => {
     const response = await request(app).get('/api/games').expect(200);
-    expect(response.body.map((game: { id: string }) => game.id)).toEqual(['wheel', 'dice', 'slots', 'cards']);
-    expect(response.body[0].locked).toBe(false);
-    expect(response.body[2].locked).toBe(false);
-    expect(response.body[3].locked).toBe(true);
+    expect(response.body.map((game: { id: string }) => game.id)).toEqual(['wheel', 'dice', 'slots', 'cards', 'roulette', 'horserace', 'bomb']);
+    expect(response.body.map((game: { locked: boolean }) => game.locked)).toEqual([false, false, false, false, true, true, true]);
   });
 
-  it('allows an anonymous dice roll but rejects the premium card game', async () => {
+  it('allows all four free games but rejects each premium endpoint', async () => {
     const diceResponse = await request(app).post('/api/games/dice/roll').send(players).expect(200);
     expect(diceResponse.body.rolls).toHaveLength(2);
     const slotsResponse = await request(app).post('/api/games/slots/spin').send(players).expect(200);
     expect(slotsResponse.body.winner).toBeDefined();
-    await request(app).post('/api/games/cards/draw').send(players).expect(403);
+    await request(app).post('/api/games/cards/draw').send(players).expect(200);
+    await request(app).post('/api/wheel/spin').send(players).expect(200);
+    await request(app).post('/api/games/roulette/spin').send(players).expect(403);
+    await request(app).post('/api/games/horserace/race').send(players).expect(403);
+    await request(app).post('/api/games/bomb/start').send(players).expect(403);
   });
 
   it('requires authentication for saved players and statistics', async () => {

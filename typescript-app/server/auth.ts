@@ -11,6 +11,7 @@ export interface CurrentUser {
   premium: boolean;
   premiumExpiresAt: Date | null;
   createdAt: Date;
+  hasPassword: boolean;
 }
 
 interface UserRow {
@@ -20,6 +21,7 @@ interface UserRow {
   premium: boolean;
   premium_expires_at: Date | null;
   created_at: Date;
+  password_hash: string | null;
 }
 
 declare global {
@@ -38,6 +40,7 @@ export function toUserProfile(user: CurrentUser): UserProfile {
     displayName: user.displayName,
     premium: user.premium,
     premiumExpiresAt: user.premiumExpiresAt?.toISOString() ?? null,
+    hasPassword: user.hasPassword,
   };
 }
 
@@ -49,6 +52,7 @@ export function mapUserRow(row: UserRow): CurrentUser {
     premium: row.premium && (!row.premium_expires_at || row.premium_expires_at > new Date()),
     premiumExpiresAt: row.premium_expires_at,
     createdAt: row.created_at,
+    hasPassword: row.password_hash !== null,
   };
 }
 
@@ -74,7 +78,7 @@ async function authenticateToken(token: string): Promise<CurrentUser | undefined
   if (!Number.isSafeInteger(userId) || userId < 1) return undefined;
 
   const result = await pool.query<UserRow>(
-    `SELECT id, email, display_name, premium, premium_expires_at, created_at
+    `SELECT id, email, password_hash, display_name, premium, premium_expires_at, created_at
      FROM users
      WHERE id = $1`,
     [userId],
@@ -86,8 +90,9 @@ async function authenticateToken(token: string): Promise<CurrentUser | undefined
 export const optionalAuth: RequestHandler = async (request, _response, next) => {
   const path = request.originalUrl.split('?')[0];
   if (
-    request.method === 'POST'
-    && ['/api/auth/register', '/api/auth/login', '/api/auth/logout'].includes(path)
+    (request.method === 'POST'
+      && ['/api/auth/register', '/api/auth/login', '/api/auth/logout', '/api/auth/google'].includes(path))
+    || (request.method === 'GET' && path === '/api/auth/google/config')
   ) {
     next();
     return;

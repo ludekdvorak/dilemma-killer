@@ -1,75 +1,80 @@
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 1.5rem 3rem;
-  gap: 2.5rem;
+.page { min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:1.5rem; padding:1.5rem 1.5rem 3rem; }
+.topBar { display:flex; flex-direction:column; align-items:center; gap:.8rem; width:100%; max-width:880px; text-align:center; }
+.backBtn { border:1px solid var(--border); border-radius:100px; background:#100e20; color:var(--text-muted); padding:.6rem 1rem; font-size:.8rem; }
+.backBtn:hover { color:var(--text); border-color:#e4b988; }
+.eyebrow { font-size:.62rem; letter-spacing:.22em; color:#e4b988; margin-top:1.3rem; }
+.gameTitle { font:800 clamp(2rem,6vw,3.7rem)/1.15 var(--font-display); letter-spacing:-.04em; }
+.gameTitle span { color:#e9be95; }
+.subtitle { color:var(--text-muted); font-size:.85rem; line-height:1.6; }
+.table { --card-width:146px; --card-height:208px; --spread:100px; width:100%; max-width:880px; padding:1.25rem; border:1px solid #79604a70; border-radius:28px; background:radial-gradient(ellipse at 50% 40%,#332333,#171521 80%); box-shadow:0 25px 60px #0005,inset 0 0 0 5px #15141d,inset 0 0 0 6px #9f816424; }
+.tableHeading { display:flex; justify-content:space-between; align-items:center; gap:.5rem; color:#b89b89; font-size:.6rem; letter-spacing:.16em; padding:.3rem .5rem; }
+.premiumBadge { font-size:.5rem; border:1px solid #d9b37e50; background:#d9b37e0a; border-radius:100px; padding:.4rem .6rem; color:#e8bf93; }
+.stage { height:335px; position:relative; perspective:1100px; }
+.tableMark { position:absolute; inset:0; display:grid; place-items:center; font-size:250px; color:#d5b28a05; pointer-events:none; }
+.deck,.drawnCard { position:absolute; width:var(--card-width); height:var(--card-height); top:51px; left:calc(50% - var(--card-width) / 2); }
+.deck { transform:translateX(calc(var(--spread) * -1)); }
+.deckCard,.cardFace { position:absolute; inset:0; border:1px solid #e3c4a3; border-radius:12px; padding:7px; }
+.deckCard { background:#2a1d38; transform:translate(calc(var(--card-index) * -8px),calc(var(--card-index) * 3px)) rotate(calc(-10deg - var(--card-index) * 6deg)); box-shadow:0 2px 0 #d8c5b5,0 4px 0 #3c3044,0 6px 0 #9e8f85,0 14px 25px #0005; }
+.drawnCard { z-index:2; transform:translateX(calc(var(--spread) * -1)) rotate(-10deg); transition:transform .8s cubic-bezier(.2,.75,.3,1); }
+.drawnCard.dealt { transform:translateX(var(--spread)) translateY(-10px) rotate(7deg); }
+.card { width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .9s cubic-bezier(.3,.15,.25,1); }
+.flipped { transform:rotateY(180deg); }
+.cardFace { backface-visibility:hidden; box-shadow:0 18px 28px #0006; }
+.cardBack { background:#2a1d38; }
+.backDesign { width:100%; height:100%; border:1px solid #bda182; border-radius:7px; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; color:#e2bd93; background:repeating-linear-gradient(45deg,transparent,transparent 6px,#dbb28b0c 6px,#dbb28b0c 7px),repeating-linear-gradient(-45deg,transparent,transparent 6px,#dbb28b0c 6px,#dbb28b0c 7px),#302039; }
+.backDesign::before { content:''; position:absolute; inset:4px; border:1px solid #bda18244; border-radius:4px; }
+.emblem { width:60px; height:60px; border:1px solid #cfad86; transform:rotate(45deg); display:grid; place-items:center; box-shadow:0 0 0 5px #c5a17b15; background:#32223d; }
+.emblem span { transform:rotate(-45deg); font:700 16px var(--font-display); letter-spacing:-1px; }
+.backWordmark { font-size:5px; letter-spacing:2px; }
+.backCorner,.backCornerBottom { position:absolute; top:7px; left:8px; font-size:14px; }
+.backCornerBottom { top:auto; left:auto; right:8px; bottom:7px; }
+.cardFront { transform:rotateY(180deg); background:linear-gradient(145deg,#fffdf4,#e7dbc6); color:#392638; border-color:#fffcf1; }
+.faceFrame { position:absolute; inset:17px; border:1px solid #7b526760; border-radius:8px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:.65rem; padding:9px; text-align:center; background:radial-gradient(circle at center,#fffaf0,#f1e8d8); }
+.cardStar,.cardStarBottom { position:absolute; z-index:1; top:11px; left:12px; color:#9e6b7a; font-size:.8rem; }
+.cardStarBottom { inset:auto 12px 11px auto; }
+.nameLabel { color:#906b76; font:700 .42rem var(--font-display); letter-spacing:.12em; }
+.cardName { max-width:100%; color:#402739; font:800 clamp(.8rem,1.5vw,1.05rem)/1.18 var(--font-display); overflow-wrap:anywhere; }
+.nameRule { width:45%; height:1px; background:#9e6b7a80; }
+.faceWordmark { color:#906b76; font-size:.36rem; letter-spacing:.13em; }
+.deckCaption,.drawCaption { position:absolute; top:294px; left:calc(50% - var(--spread)); transform:translateX(-50%); color:#947f80; font-size:.5rem; letter-spacing:.2em; white-space:nowrap; }
+.drawCaption { left:calc(50% + var(--spread)); opacity:0; color:#e1b88e; transition:opacity .4s; }
+.captionVisible { opacity:1; }
+.shuffling .deckCard { animation:shuffle .55s ease-in-out infinite alternate; animation-delay:calc(var(--card-index) * -130ms); }
+@keyframes shuffle { to { transform:translate(calc((var(--card-index) - 1) * 28px),calc(var(--card-index) * -8px)) rotate(calc(var(--card-index) * 12deg - 20deg)); } }
+.players { display:flex; justify-content:center; flex-wrap:wrap; gap:.4rem; border-top:1px solid #bda18220; padding:1rem .5rem .2rem; }
+.player { display:flex; align-items:center; gap:.4rem; color:#a19aaa; background:#0002; border:1px solid #bda18215; border-radius:100px; padding:.4rem .7rem; font-size:.7rem; max-width:100%; overflow-wrap:anywhere; }
+.playerDot { width:4px; height:4px; flex-shrink:0; border-radius:50%; background:#8b7c98; }
+.selectedPlayer { color:#f6d0a5; border-color:#d6b08788; background:#d6b08712; }
+.selectedPlayer .playerDot { background:#f6d0a5; }
+.result { min-height:74px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.4rem; text-align:center; max-width:880px; }
+.hint { color:var(--text-muted); font-size:.8rem; }
+.winnerLabel { color:#e6b78f; font-size:.6rem; letter-spacing:.22em; }
+.winnerName { color:#fff2e4; font:700 clamp(1.4rem,4vw,2.2rem) var(--font-display); overflow-wrap:anywhere; max-width:100%; }
+.errorNote { color:var(--danger); font-size:.85rem; text-align:center; }
+.drawBtn { display:flex; align-items:center; justify-content:center; gap:1.5rem; border:1px solid #f0c69c; border-radius:14px; background:linear-gradient(130deg,#f4d2b0,#d3a374); color:#342236; padding:1.05rem 1.7rem; font:800 .8rem var(--font-display); box-shadow:0 8px 30px #e9be951a; }
+.drawBtn span { font-size:1.3rem; }
+.drawBtn:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 10px 30px #e9be9533; }
+.drawBtn:disabled { opacity:.65; cursor:wait; }
+@media(max-width:520px) {
+  .page { padding:1rem .8rem 2rem; gap:1.2rem; } .gameTitle { font-size:1.9rem; } .eyebrow { font-size:.5rem; letter-spacing:.15em; }
+  .table { --card-width:112px; --card-height:164px; --spread:69px; padding:1rem .5rem; border-radius:20px; }
+  .stage { height:275px; } .tableHeading { font-size:.46rem; letter-spacing:.08em; } .premiumBadge { font-size:.43rem; }
+  .deckCaption,.drawCaption { top:245px; } .deckCard,.cardFace { padding:5px; border-radius:9px; }
+  .emblem { width:43px; height:43px; } .emblem span { font-size:13px; } .backWordmark { font-size:4px; letter-spacing:1px; }
+  .faceFrame { inset:12px; gap:.4rem; padding:5px; } .nameLabel { font-size:.35rem; } .cardName { font-size:.72rem; } .faceWordmark { font-size:.3rem; }
+  .drawBtn { width:100%; max-width:350px; } .players { padding:.8rem .3rem .1rem; }
 }
-.topBar { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 700px; }
-.backBtn {
-  align-self: flex-start;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
+@media(prefers-reduced-motion:reduce) {
+  .shuffling .deckCard { animation-duration:.55s!important; animation-iteration-count:infinite!important; }
+  .card { transition-duration:.9s!important; }
+  .drawnCard { transition-duration:.8s!important; }
 }
-.backBtn:hover { color: var(--text); border-color: var(--text-muted); }
-.logo {
-  font-family: var(--font-display);
-  font-size:.7rem;letter-spacing:.14em;color:#b79cff;
+@media(max-width:360px) {
+  .table { --card-width:96px; --card-height:142px; --spread:52px; }
+  .stage { height:254px; }
+  .deckCaption,.drawCaption { top:224px; }
+  .emblem { width:36px; height:36px; }
+  .backDesign { gap:14px; }
+  .faceFrame { inset:9px; }
+  .cardName { font-size:.65rem; }
 }
-.gameTitle { font-family:var(--font-display);font-size:2rem;font-weight:800;letter-spacing:.05em;text-shadow:0 0 25px rgba(255,61,129,.3) }
-.cardWrap { perspective: 1000px; }
-.card {
-  width: 160px;
-  height: 224px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-}
-.card.flipped { transform: rotateY(180deg); }
-.cardFace {
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  border: 1.5px solid var(--border);
-}
-.cardBack { background:linear-gradient(145deg,#251944,#0d0a19);font-size:3rem;box-shadow:0 20px 60px rgba(139,92,246,.25),inset 0 0 0 8px rgba(139,92,246,.08); }
-.cardFront { background: var(--surface2); transform: rotateY(180deg); flex-direction: column; gap: 0.5rem; }
-.cardRank { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; }
-.cardRed { color: var(--danger); }
-.cardBlack { color: var(--text); }
-.winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-.winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
-.winnerName {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #f0eeff, #06d6a0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  max-width: min(90vw, 700px);
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-.errorNote { color: var(--danger); font-size: 0.85rem; }
-.drawBtn {
-  background: linear-gradient(135deg, #ff4d8d, #d92069);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  padding: 1rem 2.5rem;
-  box-shadow: 0 4px 20px rgba(6,214,160,0.3);
-}
-.drawBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(6,214,160,0.45); }
-.drawBtn:disabled { opacity: 0.6; cursor: not-allowed; }

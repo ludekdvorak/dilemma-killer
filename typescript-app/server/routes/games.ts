@@ -3,7 +3,7 @@ import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { GameId } from '../../shared/contracts.js';
 import { pool } from '../db/pool.js';
 import { HttpError } from '../errors.js';
-import { drawCard, isGameLocked, listGames, rollDice, spinSlots, spinWheel } from '../services/games.js';
+import { drawCard, isGameLocked, listGames, raceHorses, rollDice, spinRoulette, spinSlots, spinWheel, startBomb } from '../services/games.js';
 import { playersSchema } from '../validation.js';
 
 const gameActionLimiter = rateLimit({
@@ -59,6 +59,30 @@ gamesRouter.post('/slots/spin', gameActionLimiter, async (request, response) => 
   const players = playersSchema.parse(request.body);
   const result = spinSlots(players);
   await recordPlay(request.user?.id, 'slots', players.length);
+  response.json(result);
+});
+
+gamesRouter.post('/roulette/spin', gameActionLimiter, async (request, response) => {
+  requireUnlocked('roulette', request.user?.premium ?? false);
+  const players = playersSchema.parse(request.body);
+  const result = spinRoulette(players);
+  await recordPlay(request.user?.id, 'roulette', players.length);
+  response.json(result);
+});
+
+gamesRouter.post('/horserace/race', gameActionLimiter, async (request, response) => {
+  requireUnlocked('horserace', request.user?.premium ?? false);
+  const players = playersSchema.parse(request.body);
+  const result = raceHorses(players);
+  await recordPlay(request.user?.id, 'horserace', players.length);
+  response.json(result);
+});
+
+gamesRouter.post('/bomb/start', gameActionLimiter, async (request, response) => {
+  requireUnlocked('bomb', request.user?.premium ?? false);
+  const players = playersSchema.parse(request.body);
+  const result = startBomb(players);
+  await recordPlay(request.user?.id, 'bomb', players.length);
   response.json(result);
 });
 

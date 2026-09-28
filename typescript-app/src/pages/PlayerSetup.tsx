@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type Dispatch, type SetStateAction } from 'react';
 import type { Player, SavedGroup, SavedPlayer, UserStatistics } from '../../shared/contracts';
 import {
   addSavedPlayer,
@@ -19,6 +19,8 @@ const MAX_PLAYERS = 50;
 
 interface PlayerSetupProps {
   onStart: (players: Player[]) => void;
+  players: Player[];
+  onPlayersChange: Dispatch<SetStateAction<Player[]>>;
   onGoToAuth: () => void;
   onViewProfile: () => void;
   onViewStatistics: () => void;
@@ -28,15 +30,13 @@ type CardStyle = CSSProperties & { '--card-color': string };
 
 export default function PlayerSetup({
   onStart,
+  players,
+  onPlayersChange: setPlayers,
   onGoToAuth,
   onViewProfile,
   onViewStatistics,
 }: PlayerSetupProps) {
   const { user, logout } = useAuth();
-  const [players, setPlayers] = useState<Player[]>([
-    { id: '1', name: 'Player 1' },
-    { id: '2', name: 'Player 2' },
-  ]);
   const [input, setInput] = useState('');
   const [roster, setRoster] = useState<SavedPlayer[]>([]);
   const [groups, setGroups] = useState<SavedGroup[]>([]);

@@ -1,4 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@600;700;800;900&display=swap');
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('@fontsource-variable/orbitron/files/orbitron-latin-wght-normal.woff2') format('woff2');
+}
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -87,3 +100,15 @@ button:active:not(:disabled) { transform: scale(.97) !important; }
     transition-duration: .01ms !important;
   }
 }
+
+.game-navigation { width:100%; display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
+.game-login { border:1px solid var(--border-hot); border-radius:100px; padding:.6rem 1rem; color:#d4c2ff; background:rgba(139,92,246,.1); font-size:.75rem; white-space:nowrap; }
+.game-login:hover { background:rgba(139,92,246,.22); border-color:var(--accent); }
+.game-account { display:flex; align-items:center; gap:.45rem; color:var(--text-muted); font-size:.75rem; max-width:65%; overflow-wrap:anywhere; }
+.account-dot { width:6px; height:6px; border-radius:50%; background:var(--accent3); flex-shrink:0; }
+.auth-dialog { color:var(--text); background:#100d20; border:1px solid var(--border-hot); border-radius:24px; margin:auto; width:min(480px,calc(100% - 24px)); max-height:calc(100dvh - 24px); padding:0; box-shadow:0 24px 100px #0009; }
+.auth-dialog::backdrop { background:rgba(3,3,12,.82); }
+.auth-dialog > main { min-height:0; padding:2rem 1.25rem; }
+.auth-dialog h1 { font-size:clamp(1.5rem,5vw,2.2rem); }
+.auth-loading { padding:3rem; text-align:center; }
+body:has(.auth-dialog[open]) { overflow:hidden; }

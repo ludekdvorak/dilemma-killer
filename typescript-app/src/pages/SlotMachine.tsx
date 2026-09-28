@@ -1,3 +1,4 @@
+import GameAccount from '../components/GameAccount';
 import { useEffect, useRef, useState } from 'react';
 import type { Player } from '../../shared/contracts';
 import { spinSlots } from '../api';
@@ -7,13 +8,14 @@ import styles from './SlotMachine.module.css';
 interface SlotMachineProps {
   players: Player[];
   onBack: () => void;
+  onGoToAuth: () => void;
 }
 
 function randomPlayer(players: Player[]): Player {
   return players[Math.floor(Math.random() * players.length)];
 }
 
-export default function SlotMachine({ players, onBack }: SlotMachineProps) {
+export default function SlotMachine({ players, onBack, onGoToAuth }: SlotMachineProps) {
   const [reels, setReels] = useState<Player[]>(() => [
     players[0],
     players[1 % players.length],
@@ -153,7 +155,10 @@ export default function SlotMachine({ players, onBack }: SlotMachineProps) {
   return (
     <main className={styles.page}>
       <header className={styles.topBar}>
-        <button className={styles.backBtn} onClick={onBack}>← Back</button>
+        <div className="game-navigation">
+          <button className={styles.backBtn} onClick={onBack}>← Back</button>
+          <GameAccount onGoToAuth={onGoToAuth} />
+        </div>
         <div className={styles.logo}>🎮 DILEMMA KILLER</div>
         <h1 className={styles.title}>WINNER <span>SLOTS</span></h1>
         <p>Three matching names. One guaranteed winner.</p>

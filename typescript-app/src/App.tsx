@@ -1,105 +1,108 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { GameId, Player } from '../shared/contracts';
-import { useAuth } from './context/AuthContext';
 import Starfield from './components/Starfield';
-import Auth from './pages/Auth';
-import CardDraw from './pages/CardDraw';
-import DiceRoll from './pages/DiceRoll';
-import GameSelect from './pages/GameSelect';
-import LuckyWheel from './pages/LuckyWheel';
 import PlayerSetup from './pages/PlayerSetup';
-import Profile from './pages/Profile';
-import SlotMachine from './pages/SlotMachine';
-import Statistics from './pages/Statistics';
-import Upgrade from './pages/Upgrade';
 
-type Screen =
-  | 'setup'
-  | 'auth'
-  | 'games'
-  | 'upgrade'
-  | 'wheel'
-  | 'dice'
-  | 'slots'
-  | 'cards'
-  | 'statistics'
-  | 'profile';
+const Auth = lazy(() => import('./pages/Auth'));
+const CardDraw = lazy(() => import('./pages/CardDraw'));
+const DiceRoll = lazy(() => import('./pages/DiceRoll'));
+const GameSelect = lazy(() => import('./pages/GameSelect'));
+const LuckyWheel = lazy(() => import('./pages/LuckyWheel'));
+const Profile = lazy(() => import('./pages/Profile'));
+const SlotMachine = lazy(() => import('./pages/SlotMachine'));
+const Statistics = lazy(() => import('./pages/Statistics'));
+const Upgrade = lazy(() => import('./pages/Upgrade'));
+const Roulette = lazy(() => import('./pages/Roulette'));
+const HorseRace = lazy(() => import('./pages/HorseRace'));
+const TickingBomb = lazy(() => import('./pages/TickingBomb'));
+
+type Screen = 'setup' | 'games' | 'upgrade' | GameId | 'statistics' | 'profile';
 
 export default function App() {
-  const { loading } = useAuth();
   const [screen, setScreen] = useState<Screen>(() => (
     new URLSearchParams(window.location.search).get('payment') === 'return' ? 'upgrade' : 'setup'
   ));
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [authReturnScreen, setAuthReturnScreen] = useState<Screen>('setup');
+  const [players, setPlayers] = useState<Player[]>([
+    { id: '1', name: 'Player 1' },
+    { id: '2', name: 'Player 2' },
+  ]);
+  const [authOpen, setAuthOpen] = useState(false);
   const [upgradeReturnScreen, setUpgradeReturnScreen] = useState<Screen>('setup');
+  const [statisticsReturnScreen, setStatisticsReturnScreen] = useState<Screen>('setup');
+  const authDialog = useRef<HTMLDialogElement>(null);
 
-  if (loading) {
-    return <div className="app-loading">Loading Dilemma Killer…</div>;
-  }
+  useEffect(() => {
+    if (authOpen) authDialog.current?.showModal();
+    else authDialog.current?.close();
+  }, [authOpen]);
 
   const handleStart = (playerList: Player[]) => {
     setPlayers(playerList);
     setScreen('games');
   };
-
-  const handleSelectGame = (gameId: GameId) => setScreen(gameId);
-
-  const goToAuth = (returnScreen: Screen) => {
-    setAuthReturnScreen(returnScreen);
-    setScreen('auth');
+  const goToAuth = () => setAuthOpen(true);
+  const goToStatistics = () => {
+    setStatisticsReturnScreen(screen);
+    setScreen('statistics');
   };
-
   const goToUpgrade = (returnScreen: Screen) => {
     setUpgradeReturnScreen(returnScreen);
     setScreen('upgrade');
   };
+  const gameProps = { players, onBack: () => setScreen('games'), onGoToAuth: goToAuth };
 
   return (
     <>
       <Starfield />
-      {screen === 'setup' && (
-        <PlayerSetup
-          onStart={handleStart}
-          onGoToAuth={() => goToAuth('setup')}
-          onViewProfile={() => setScreen('profile')}
-          onViewStatistics={() => setScreen('statistics')}
-        />
-      )}
-      {screen === 'auth' && (
-        <Auth
-          onDone={() => setScreen(authReturnScreen)}
-          onSkip={() => setScreen(authReturnScreen)}
-        />
-      )}
-      {screen === 'games' && (
-        <GameSelect
-          players={players}
-          onSelectGame={handleSelectGame}
-          onGoToUpgrade={() => goToUpgrade('games')}
-          onViewStatistics={() => setScreen('statistics')}
-          onBack={() => setScreen('setup')}
-        />
-      )}
-      {screen === 'upgrade' && (
-        <Upgrade
-          onDone={() => setScreen(upgradeReturnScreen)}
-          onGoToAuth={() => goToAuth('upgrade')}
-        />
-      )}
-      {screen === 'wheel' && <LuckyWheel players={players} onBack={() => setScreen('games')} />}
-      {screen === 'dice' && <DiceRoll players={players} onBack={() => setScreen('games')} />}
-      {screen === 'slots' && <SlotMachine players={players} onBack={() => setScreen('games')} />}
-      {screen === 'cards' && <CardDraw players={players} onBack={() => setScreen('games')} />}
-      {screen === 'statistics' && (
-        <Statistics onBack={() => setScreen(players.length >= 2 ? 'games' : 'setup')} />
-      )}
-      {screen === 'profile' && (
-        <Profile
-          onBack={() => setScreen('setup')}
-          onUpgrade={() => goToUpgrade('profile')}
-        />
-      )}
+      <Suspense fallback={<main className="app-loading" role="status">Opening game…</main>}>
+        {screen === 'setup' && (
+          <PlayerSetup
+            players={players}
+            onPlayersChange={setPlayers}
+            onStart={handleStart}
+            onGoToAuth={goToAuth}
+            onViewProfile={() => setScreen('profile')}
+            onViewStatistics={goToStatistics}
+          />
+        )}
+        {screen === 'games' && (
+          <GameSelect
+            players={players}
+            onSelectGame={setScreen}
+            onGoToUpgrade={() => goToUpgrade('games')}
+            onGoToAuth={goToAuth}
+            onViewStatistics={goToStatistics}
+            onBack={() => setScreen('setup')}
+          />
+        )}
+        {screen === 'upgrade' && (
+          <Upgrade onDone={() => setScreen(upgradeReturnScreen)} onGoToAuth={goToAuth} />
+        )}
+        {screen === 'wheel' && <LuckyWheel {...gameProps} />}
+        {screen === 'dice' && <DiceRoll {...gameProps} />}
+        {screen === 'slots' && <SlotMachine {...gameProps} />}
+        {screen === 'cards' && <CardDraw {...gameProps} />}
+        {screen === 'roulette' && <Roulette {...gameProps} />}
+        {screen === 'horserace' && <HorseRace {...gameProps} />}
+        {screen === 'bomb' && <TickingBomb {...gameProps} />}
+        {screen === 'statistics' && <Statistics onBack={() => setScreen(statisticsReturnScreen)} />}
+        {screen === 'profile' && (
+          <Profile onBack={() => setScreen('setup')} onUpgrade={() => goToUpgrade('profile')} />
+        )}
+      </Suspense>
+      <dialog
+        ref={authDialog}
+        className="auth-dialog"
+        aria-labelledby="auth-title"
+        onCancel={() => setAuthOpen(false)}
+        onClose={() => setAuthOpen(false)}
+      >
+        {authOpen && (
+          <Suspense fallback={<p className="auth-loading" role="status">Opening sign-in…</p>}>
+            <Auth onDone={() => setAuthOpen(false)} onSkip={() => setAuthOpen(false)} />
+          </Suspense>
+        )}
+      </dialog>
     </>
   );
 }

@@ -1,113 +1,33 @@
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 1.5rem 3rem;
-  gap: 2.5rem;
-}
-.topBar { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 700px; }
-.backBtn {
-  align-self: flex-start;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
-}
-.backBtn:hover { color: var(--text); border-color: var(--text-muted); }
-.logo {
-  font-family: var(--font-display);
-  font-size: .7rem; letter-spacing:.14em; color:#b79cff;
-}
-.gameTitle { font-family:var(--font-display);font-size:2rem;font-weight:800;letter-spacing:.05em;text-shadow:0 0 25px rgba(34,211,238,.32) }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; width: 100%; max-width: 760px; }
-.playerDie {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  background: linear-gradient(145deg,rgba(20,17,39,.9),rgba(8,8,18,.92));
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  min-width: 0;
-  padding: 1.25rem 1rem 1rem;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.playerDie.rolling { border-color: rgba(34,211,238,.42); }
-.playerDie.winner { border-color: var(--accent2); transform: scale(1.05); box-shadow: 0 4px 30px rgba(34,211,238,.35),inset 0 0 24px rgba(34,211,238,.08); }
-.dieStage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 112px;
-}
-.dieShadow {
-  position: absolute;
-  left: 50%;
-  bottom: 3px;
-  width: 72px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.5);
-  filter: blur(7px);
-  transform: translateX(-50%);
-  transition: width .2s, opacity .2s;
-}
-.rolling .dieShadow { width: 48px; opacity: .55; animation: shadowPulse 2s ease-in-out infinite alternate; }
-.playerName { font-size: 0.9rem; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
-.rollValue {
-  min-height: 1em;
-  color: var(--text-muted);
-  font-family: var(--font-display);
-  font-size: .66rem;
-  letter-spacing: .12em;
-}
-.winner .rollValue { color: var(--accent2); }
-.winnerBanner { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-.winnerLabel { font-family: var(--font-display); letter-spacing: 0.2em; font-size: 0.9rem; color: var(--text-muted); }
-.winnerNames {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: .35rem .8rem;
-  max-width: min(90vw, 760px);
-}
-.winnerName {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #f0eeff, #ffd166);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  max-width: min(90vw, 700px);
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-.winnerName:not(:last-child)::after {
-  content: ' +';
-  -webkit-text-fill-color: var(--text-muted);
-}
-.errorNote { color: var(--danger); font-size: 0.85rem; }
-.rollBtn {
-  background: linear-gradient(135deg, #45e1f4, #0aaac6);
-  border: none;
-  border-radius: 12px;
-  color: #031518;
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  padding: 1rem 2.5rem;
-  box-shadow: 0 4px 20px rgba(255,209,102,0.3);
-}
-.rollBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,209,102,0.45); }
-.rollBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-@keyframes shadowPulse {
-  from { transform:translateX(-50%) scale(.72); opacity:.35; }
-  to { transform:translateX(-50%) scale(1.12); opacity:.65; }
-}
-@media(prefers-reduced-motion:reduce){
-  .rolling .dieShadow{animation-duration:2s!important}
-}
+.page { min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:1.5rem; padding:1.5rem 1.5rem 3rem; }
+.topBar { display:flex; flex-direction:column; align-items:center; gap:.8rem; width:100%; max-width:880px; text-align:center; }
+.backBtn { border:1px solid var(--border); border-radius:100px; background:#100e20; color:var(--text-muted); padding:.6rem 1rem; font-size:.8rem; }
+.backBtn:hover { color:var(--text); border-color:var(--accent2); }
+.eyebrow { font-size:.62rem; letter-spacing:.25em; color:var(--accent2); margin-top:1.3rem; }
+.gameTitle { font:800 clamp(2rem,6vw,3.8rem)/1.15 var(--font-display); letter-spacing:-.04em; }
+.gameTitle span { color:var(--accent2); }
+.subtitle { color:var(--text-muted); font-size:.85rem; line-height:1.6; max-width:32rem; }
+.table { width:100%; max-width:880px; padding:1.25rem; border:1px solid #2d5962; border-radius:28px; background:radial-gradient(ellipse at 50% 20%,#123336,#091c21 80%); box-shadow:0 25px 60px #0005,inset 0 0 0 5px #09171d,inset 0 0 0 6px #31525b60; }
+.tableHeading,.tableFooter { display:flex; justify-content:space-between; gap:.5rem; color:#78aaa9; font-size:.6rem; letter-spacing:.16em; padding:.3rem .5rem 1.3rem; }
+.tableHeading span:last-child { color:#84ccc5; }
+.tableFooter { justify-content:center; padding:1.2rem 0 .2rem; font-size:.5rem; opacity:.7; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:.8rem; }
+.playerDie { display:flex; flex-direction:column; align-items:center; min-width:0; position:relative; padding:1.8rem .75rem 1.3rem; border:1px solid #88ddce12; border-radius:18px; background:linear-gradient(160deg,#ffffff05,#0002); transition:background .2s,border-color .2s; }
+.playerNumber { position:absolute; left:.8rem; top:.7rem; font:600 .55rem var(--font-display); color:#70a6a080; }
+.dieStage { display:grid; place-items:center; width:100%; height:180px; padding-top:30px; }
+.playerName { margin-top:.5rem; font-weight:600; font-size:.9rem; text-align:center; overflow-wrap:anywhere; }
+.rollValue { color:#75a5a4; font-size:.55rem; letter-spacing:.12em; margin-top:.5rem; }
+.winner { border-color:#78ecdd90; background:linear-gradient(160deg,#2ad3b31c,#2ad3b309); }
+.winner .rollValue { color:#9dffe7; }
+.winnerTag { position:absolute; top:.65rem; right:.65rem; border-radius:100px; padding:.3rem .45rem; background:#beffdb; color:#164238; font-size:.46rem; font-weight:800; letter-spacing:.05em; }
+.result { min-height:74px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.4rem; text-align:center; max-width:880px; }
+.hint { color:var(--text-muted); font-size:.8rem; }
+.winnerLabel { color:var(--accent2); font-size:.6rem; letter-spacing:.22em; }
+.winnerName { color:#effff9; font:700 clamp(1.4rem,4vw,2.2rem) var(--font-display); overflow-wrap:anywhere; max-width:100%; }
+.errorNote { color:var(--danger); font-size:.85rem; text-align:center; }
+.rollBtn { display:flex; justify-content:center; align-items:center; gap:1.5rem; border:1px solid #7ce8e8; border-radius:14px; background:linear-gradient(130deg,#a5f8e2,#40cedc); color:#073537; padding:1.05rem 1.7rem; font:800 .8rem var(--font-display); box-shadow:0 8px 30px #22d3ee22; }
+.rollBtn span { font-size:1.3rem; }
+.buttonDie { width:18px; height:18px; border:1.5px solid currentColor; border-radius:4px; position:relative; }
+.buttonDie::after { content:''; position:absolute; top:3px; left:3px; width:3px; height:3px; background:currentColor; border-radius:50%; box-shadow:6px 0 currentColor,3px 3px currentColor,0 6px currentColor,6px 6px currentColor; }
+.rollBtn:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 10px 30px #22d3ee44; }
+.rollBtn:disabled { opacity:.65; cursor:wait; }
+@media(max-width:520px) { .page { padding:1rem .8rem 2rem; gap:1.2rem; } .table { padding:1rem .6rem; border-radius:20px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.4rem; } .tableHeading { font-size:.5rem; letter-spacing:.1em; } .dieStage { height:160px; } .gameTitle { font-size:2rem; } .winnerTag { top:.7rem; right:.4rem; font-size:.4rem; } .rollBtn { width:100%; max-width:350px; } }

@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
@@ -14,6 +15,7 @@ interface AuthContextValue {
   user: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string, signal?: AbortSignal) => Promise<void>;
+  loginWithGoogle: (credential: string, signal?: AbortSignal) => Promise<void>;
   register: (email: string, password: string, displayName: string, signal?: AbortSignal) => Promise<void>;
   logout: () => Promise<void>;
   upgradeToPremium: () => Promise<void>;
@@ -27,11 +29,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const initialRequest = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
+    initialRequest.current = controller;
     api.me(controller.signal)
-      .then(setUser)
+      .then((result) => { if (!controller.signal.aborted) setUser(result); })
       .catch(() => undefined)
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -39,17 +43,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => controller.abort();
   }, []);
 
-  const login = useCallback(async (email: string, password: string, signal?: AbortSignal) => {
-    const result = await api.login(email, password, signal);
+  const finishAuthentication = useCallback((result: UserProfile) => {
+    // A slow startup check must never overwrite a more recent sign-in.
+    initialRequest.current?.abort();
+    setLoading(false);
     setUser(result);
   }, []);
+
+  const login = useCallback(async (email: string, password: string, signal?: AbortSignal) => {
+    const result = await api.login(email, password, signal);
+    finishAuthentication(result);
+  }, [finishAuthentication]);
+
+  const loginWithGoogle = useCallback(async (credential: string, signal?: AbortSignal) => {
+    finishAuthentication(await api.loginWithGoogle(credential, signal));
+  }, [finishAuthentication]);
 
   const register = useCallback(async (email: string, password: string, displayName: string, signal?: AbortSignal) => {
     const result = await api.register(email, password, displayName, signal);
-    setUser(result);
-  }, []);
+    finishAuthentication(result);
+  }, [finishAuthentication]);
 
   const logout = useCallback(async () => {
+    initialRequest.current?.abort();
+    setLoading(false);
     try {
       await api.logout();
     } finally {
@@ -81,6 +98,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     user,
     loading,
     login,
+    loginWithGoogle,
     register,
     logout,
     upgradeToPremium,
@@ -91,6 +109,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     user,
     loading,
     login,
+    loginWithGoogle,
     register,
     logout,
     upgradeToPremium,

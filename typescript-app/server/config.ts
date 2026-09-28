@@ -24,6 +24,7 @@ const envSchema = z.object({
   RUN_MIGRATIONS_ON_START: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10).default(0),
   APP_BASE_URL: optionalEnvironmentValue(z.string().url()),
+  GOOGLE_CLIENT_ID: optionalEnvironmentValue(z.string().trim().min(1)),
   GOPAY_GOID: optionalEnvironmentValue(z.string().min(1)),
   GOPAY_CLIENT_ID: optionalEnvironmentValue(z.string().min(1)),
   GOPAY_CLIENT_SECRET: optionalEnvironmentValue(z.string().min(1)),
@@ -85,6 +86,7 @@ export const config = {
   trustProxyHops: env.TRUST_PROXY_HOPS,
   authCookieName: 'dilemma_killer_session',
   appBaseUrl: env.APP_BASE_URL,
+  googleClientId: env.GOOGLE_CLIENT_ID,
   goPay: {
     configured: goPayConfigured,
     goId: env.GOPAY_GOID,
